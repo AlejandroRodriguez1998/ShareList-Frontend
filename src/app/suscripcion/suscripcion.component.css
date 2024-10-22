@@ -8,3 +8,17 @@
       margin-top: 20px;
     }
 }
+
+.modal-content {
+  border-radius: 8px; /* Bordes redondeados como en SweetAlert2 */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); /* Sombra similar */
+}
+
+.modal-header {
+  background-color: #f5f5f5; /* Color de fondo claro */
+  border-bottom: 1px solid #ddd;
+}
+
+.modal-footer {
+  border-top: 1px solid #ddd;
+}
