@@ -1,0 +1,8 @@
+.custom-form {
+    margin-top: 20px;
+  }
+  
+.invalid-feedback {
+    color: red;
+    font-size: 0.9rem;
+}
