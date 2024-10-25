@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { loadStripe, Stripe } from '@stripe/stripe-js';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { PagosService } from '../pagos.service';
+ 
+//Para los avisos
 import Swal from 'sweetalert2';
-
-declare var bootstrap: any; 
-
 @Component({
   selector: 'app-suscripcion',
   standalone: true,
@@ -22,52 +21,53 @@ export class SuscripcionComponent {
   clientSecret: string | null = null;
   amount: number = 3.00;
   
-  constructor(private http: HttpClient) {}
+  constructor(private service : PagosService) {}
 
   ngOnInit() {
+    // Cada vez que entras al componente, carga la clave de Stripe
     loadStripe(this.key).then(stripeInstance => {
       this.stripe = stripeInstance;
     });
   }
 
   abrirModalStripe() {
+    // Abre el modal y empieza la animacion de cargar
     Swal.fire({
       title: 'Preparando el pago...',
       text: 'Por favor, espera mientras preparamos tu pago.',
-      allowOutsideClick: false,
-      allowEscapeKey: false,
+      allowOutsideClick: false, // Evita el cierre al hacer clic fuera del modal
+      allowEscapeKey: false, // Evita el cierre al presionar la tecla Esc
       didOpen: () => {
         Swal.showLoading(Swal.getConfirmButton()); // Mostrar spinner mientras se prepara el pago
       }
     });
   
     // Hacer la solicitud para obtener el clientSecret
-    this.http.put('http://localhost:9000/pagos/prepararTransaccion', this.amount, { responseType: 'text' })
-      .subscribe({
-        next: (clientSecret) => {
-          if (clientSecret) {
-            this.clientSecret = clientSecret;
-            this.mostrarStripeEnSweetAlert();  // Mostrar el formulario de Stripe dentro de SweetAlert2
-          } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'No se pudo obtener la transacción. Intenta de nuevo más tarde.'
-            });
-          }
-        },
-        error: (error) => {
+    this.service.prepararTransaccion(this.amount).subscribe({
+      next: (clientSecret) => {
+        if (clientSecret) {
+          this.clientSecret = clientSecret;
+          this.mostrarStripeEnSweetAlert();  // Mostrar el formulario de Stripe dentro de SweetAlert2
+        } else {
           Swal.fire({
             icon: 'error',
-            title: 'Error en el servidor',
-            text: `Hubo un problema al intentar conectar con el servidor: ${error}`
+            title: 'Error',
+            text: 'No se pudo obtener la transacción. Intenta de nuevo más tarde.'
           });
         }
-      });
+      },
+      error: (error) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error en el servidor',
+          text: `Hubo un problema al intentar conectar con el servidor: ${error}`
+        });
+      }
+    });
   }
 
   mostrarStripeEnSweetAlert() {
-    var cardElement: any = null;
+    var cardElement: any = null; // Necesitamos esto para poder mandarlo luego a procesarPago
 
     Swal.fire({
       title: 'Introduce los datos de tu tarjeta',
@@ -96,7 +96,7 @@ export class SuscripcionComponent {
     });
   }
 
-  montarFormularioStripe() {
+  montarFormularioStripe() { // Monta el formulario de Stripe en el div con id stripe-container
     const elements = this.stripe!.elements();
     const cardElement = elements.create('card');
     cardElement.mount('#stripe-container');
@@ -104,8 +104,9 @@ export class SuscripcionComponent {
   }
   
   procesarPago(cardElement: any) {
+    // Necesita una promise el preConfirm de SweetAlert2
     return new Promise<void>((resolve, reject) => {
-      this.stripe!.confirmCardPayment(this.clientSecret!, {
+      this.stripe!.confirmCardPayment(this.clientSecret!, { // Procesa el pago Stripe
         payment_method: {
           card: cardElement,
         }
@@ -121,5 +122,4 @@ export class SuscripcionComponent {
     });
   }
   
-
 }

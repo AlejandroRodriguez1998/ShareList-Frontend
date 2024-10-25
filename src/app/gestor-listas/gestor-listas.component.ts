@@ -3,9 +3,9 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ListaService } from '../lista.service';
 import { lista } from '../modelo/lista.model';
-import { ManagerService } from '../manager.service';
 import { producto } from '../modelo/producto.model';
 
+//Para los avisos
 import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2';
 
@@ -28,9 +28,7 @@ export class GestorListasComponent {
   unidadesCompradas: number=0;
   producto : producto = new producto;
 
-  constructor(private service: ListaService,
-    public manager: ManagerService,
-    private toastr: ToastrService) { }
+  constructor(private service: ListaService, private toastr: ToastrService) { }
 
   ngOnInit() {
     this.cargarListas();

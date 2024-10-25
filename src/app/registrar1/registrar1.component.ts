@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common'; // Importa CommonModule
 import { RouterModule } from '@angular/router';  // Importa RouterModule para routerLink
-
 import { FormsModule } from '@angular/forms'; 
 import { UserService } from '../user.service';
 
