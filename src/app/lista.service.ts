@@ -14,7 +14,6 @@ export class ListaService {
 
   constructor(private http:HttpClient) {}
 
-
   obtenerListas(): Observable<lista[]> {
     let urlFinal = this.apiUrl + '/obtenerListas'
     return this.http.get<lista[]>(urlFinal);

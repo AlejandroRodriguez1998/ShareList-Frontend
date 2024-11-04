@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router'; 
-import { AuthService } from '../auth.service';  
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms'; 
 import { UserService } from '../user.service';
 
@@ -26,7 +25,6 @@ export class Login1Component {
   constructor(
     private formBuilder: FormBuilder,
     private service: UserService,
-    private authService: AuthService,
     private toastr: ToastrService,  // Inyectar AuthService
     private router: Router) {
 
@@ -46,8 +44,8 @@ export class Login1Component {
     } else {
       this.service.login(this.loginForm.controls['email'].value, this.loginForm.controls['pwd'].value)
         .subscribe(
-          (data) => {
-          this.authService.setCookie('authToken', data, 1);
+        (data) => {
+          localStorage.setItem('email', this.loginForm.controls['email'].value);
 
           Swal.fire({
             icon: 'success',
@@ -56,7 +54,7 @@ export class Login1Component {
             showConfirmButton: true,
           });
 
-          this.router.navigate(['/gestion-listas']); 
+          this.router.navigate(['/GestionarListas']); 
         },
         (error) => {
           if (error.status === 401) {

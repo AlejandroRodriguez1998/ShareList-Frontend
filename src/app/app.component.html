@@ -13,20 +13,20 @@
           <a class="nav-link" routerLink="/">Inicio</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/sobre-nosotros">Sobre Nosotros</a>
+          <a class="nav-link" routerLink="/SobreNosotros">Sobre Nosotros</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/suscripcion">Planes de Suscripción</a>
+          <a class="nav-link" routerLink="/Suscripcion">Planes de Suscripción</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/gestion-listas">Gestionar Listas</a>
+          <a class="nav-link" routerLink="/GestionarListas">Gestionar Listas</a>
         </li>
       </ul>
       <ul class="navbar-nav ml-auto">
-        <li *ngIf="!isLoggedIn()" class="nav-item">
-          <a class="nav-link" routerLink="/iniciar-sesion">Iniciar sesion</a>
+        <li *ngIf="!(isLogin$ | async)" class="nav-item">
+          <a class="nav-link" routerLink="/IniciarSesion">Iniciar sesion</a>
         </li>
-        <li *ngIf="isLoggedIn()" class="nav-item">
+        <li *ngIf="isLogin$ | async" class="nav-item">
           <a class="nav-link" (click)="logout()">Salir</a>
         </li>
       </ul>
