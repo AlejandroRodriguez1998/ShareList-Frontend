@@ -27,8 +27,24 @@ export class GestorListasComponent {
   unidadesPedidas : number=0;
   unidadesCompradas: number=0;
   producto : producto = new producto;
+  ws: WebSocket = new WebSocket('ws://localhost:80/wsListas');
 
-  constructor(private service: ListaService, private toastr: ToastrService) { }
+  constructor(private service: ListaService, private toastr: ToastrService) {
+
+    this.ws.onerror = function (event) {
+      alert(event)
+    }
+
+    this.ws.onmessage = function (event) {
+      let data = event.data;
+      data = JSON.parse(data);
+
+      if (data.tipo == "actualizacionDeLista") {
+        console.log(data.nombre);
+      }
+    }
+
+  }
 
   ngOnInit() {
     this.cargarListas();

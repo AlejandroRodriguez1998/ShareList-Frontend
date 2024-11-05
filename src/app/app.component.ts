@@ -5,6 +5,7 @@ import { Registrar1Component } from './registrar1/registrar1.component';
 import { Login1Component } from './login1/login1.component'; 
 import { GestorListasComponent } from "./gestor-listas/gestor-listas.component";
 import { AuthService } from './auth.service';
+import { UserService } from './user.service';
 
 @Component({
   selector: 'app-root',
@@ -20,17 +21,23 @@ import { AuthService } from './auth.service';
 })
 export class AppComponent {
   title = 'ShareList';
+  isLoggedIn: boolean = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
 
-  // Verificar si el usuario está logueado
-  isLoggedIn(): boolean {
-    return this.authService.isLoggedIn();
+  constructor(private userService : UserService, private router:Router) {
+    this.userService.checkCookie().subscribe(
+      token=> {
+        console.log('Token recibido:', token);
+        //this.router.navigate(['/GestorListas']);
+        this.isLoggedIn = true;
+      }
+    )
   }
+
 
   // Método para hacer logout
   logout() {
-    this.authService.clearCookie('authToken');  // Limpiar la cookie
+    this.isLoggedIn = false;
     this.router.navigate(['/login']);  // Redirigir al login
   }
 }
