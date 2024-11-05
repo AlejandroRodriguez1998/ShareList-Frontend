@@ -10,4 +10,9 @@ export class lista {
         this.nombre = "";
         this.productos = [];
     }
+
+    inicializar(nombre:string, id:string){
+        this.id = id;
+        this.nombre = nombre;
+    }
 }

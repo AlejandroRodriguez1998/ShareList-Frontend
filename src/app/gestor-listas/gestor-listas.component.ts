@@ -1,12 +1,10 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { ListaService } from '../lista.service';
-import { lista } from '../modelo/lista.model';
 import { producto } from '../modelo/producto.model';
-
-//Para los avisos
-import { ToastrService } from 'ngx-toastr';
+import { ListaService } from '../lista.service';
+import { CommonModule } from '@angular/common';
+import { lista } from '../modelo/lista.model';
+import { FormsModule } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr'; // Avisos emergentes
+import { Component } from '@angular/core';
 import Swal from 'sweetalert2';
 
 declare var bootstrap: any; // Para usar los modales de Bootstrap
@@ -20,22 +18,27 @@ declare var bootstrap: any; // Para usar los modales de Bootstrap
 })
 export class GestorListasComponent {
 
-  nuevaLista?: string;
-  misListas: lista[] = [];
-  listaSeleccionada?: lista;
-  nuevoProducto : string='';
-  unidadesPedidas : number=0;
-  unidadesCompradas: number=0;
-  producto : producto = new producto;
+  listaSeleccionada?: lista; // Lista seleccionada para añadir productos
+  misListas: lista[] = []; // Listas del usuario
+  nombreLista?: string; // Nombre de la lista a crear
 
+  // Productos
+  producto : producto = new producto;
+  nuevoProducto : string = '';
+  unidadesPedidas : number = 0;
+  unidadesCompradas: number = 0;
+  
+  // Websocket para listas compartidas
   ws : WebSocket = new WebSocket('ws://localhost/wsLista?email=' + localStorage.getItem('email'));
 
   constructor(private service: ListaService, private toastr: ToastrService) {
 
+    // Eventos del websocket - Error 
     this.ws.onerror = function(event){
       console.error('Error en la conexión websocket:', event);
     }
 
+    // Eventos del websocket - Mensaje recibido
     this.ws.onmessage = function(event){
       console.log('Mensaje recibido:', event.data);
 
@@ -47,10 +50,12 @@ export class GestorListasComponent {
     }
   }
 
+  // Método que se ejecuta al cargar el componente
   ngOnInit() {
     this.cargarListas();
   }
 
+  // Método para cargar las listas del usuario
   cargarListas() {
     this.service.obtenerListas().subscribe(
       (listas) => {
@@ -63,24 +68,32 @@ export class GestorListasComponent {
     );
   }
 
+  // Método para añadir una lista
   agregarLista() {
-    this.service.crearLista(this.nuevaLista!).subscribe(
+    if (!this.nombreLista) {
+      this.toastr.error('El nombre no puede estar vacio', 'Error en la creación');
+    }else if(this.nombreLista === ""){
+      this.toastr.error('El nombre no puede estar vacio', 'Error en la creación');
+    }
+
+    this.service.crearLista(this.nombreLista!).subscribe(
       (response) => {
         let listaCreada = new lista();
         listaCreada.id = response.id;
         listaCreada.nombre = response.nombre;
 
         this.misListas.push(listaCreada);
-        this.toastr.success(`La lista "${listaCreada.nombre}" ha sido creada.`, 'Lista creada correctamente');
+        this.toastr.success(`La lista "${listaCreada.nombre}" ha sido creada.`, 'Correcto');
         console.log('Nueva Lista añadida', listaCreada);
       },
       (error) => {
-        this.toastr.error('Hubo un error al crear la lista', 'Error en la creación');
-        console.error('Error en añadir la lista', error);
+        this.toastr.error(error.error.message, 'Error en la creación');
+        console.error('Error en añadir la lista: ', error.error.message);
       }
     );
   }
 
+  // Método para eliminar una lista
   eliminarLista(index: number) {
     Swal.fire({
       title: '¿Estás seguro?',
@@ -103,6 +116,7 @@ export class GestorListasComponent {
     });
   }
 
+  // Método para abrir el modal de añadir producto
   abrirModal(indice: number) {
     this.listaSeleccionada = this.misListas[indice];
     const modalElement = document.getElementById('productoModal');
@@ -110,6 +124,7 @@ export class GestorListasComponent {
     modal.show();
   }
 
+  // Método para añadir un producto a la lista
   agregarProducto() {
     if (this.nuevoProducto && this.listaSeleccionada) {
       console.log(`Voy a almacenar producto: "${this.nuevoProducto}"`);

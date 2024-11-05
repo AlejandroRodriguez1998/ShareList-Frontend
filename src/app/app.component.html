@@ -26,7 +26,7 @@
         <li *ngIf="!(isLogin$ | async)" class="nav-item">
           <a class="nav-link" routerLink="/IniciarSesion">Iniciar sesion</a>
         </li>
-        <li *ngIf="isLogin$ | async" class="nav-item">
+        <li *ngIf="(isLogin$ | async)" class="nav-item">
           <a class="nav-link" (click)="logout()">Salir</a>
         </li>
       </ul>

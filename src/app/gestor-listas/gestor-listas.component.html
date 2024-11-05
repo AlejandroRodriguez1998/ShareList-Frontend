@@ -1,7 +1,7 @@
 <div class="px-3 mt-3">
   <p>Tus listas de la compra</p>
 
-  <input type="text" [(ngModel)]="nuevaLista" placeholder="Nombre de la lista">
+  <input type="text" [(ngModel)]="nombreLista" placeholder="Nombre de la lista">
   <button class="btn btn-primary" (click)="agregarLista()">Crear lista</button>
 
   <p *ngIf="misListas.length === 0">No tienes listas de la compra</p>
