@@ -74,6 +74,8 @@ export class GestorListasComponent {
       this.toastr.error('El nombre no puede estar vacio', 'Error en la creación');
     }else if(this.nombreLista === ""){
       this.toastr.error('El nombre no puede estar vacio', 'Error en la creación');
+    }else if (this.nombreLista.length > 80) {
+      this.toastr.error('El nombre de la lista no puede superar los 80 caracteres', 'Error en la creación');
     }
 
     this.service.crearLista(this.nombreLista!).subscribe(
@@ -87,8 +89,19 @@ export class GestorListasComponent {
         console.log('Nueva Lista añadida', listaCreada);
       },
       (error) => {
-        this.toastr.error(error.error.message, 'Error en la creación');
-        console.error('Error en añadir la lista: ', error.error.message);
+        if (error.status === 403) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Límite alcanzado',
+            html: '<p>Los usuarios <strong>no premium</strong> solo pueden tener hasta 2 listas creadas simultáneas.</p>' +
+            '<p>Considera <a href="/Suscripcion">actualizar a premium</a> para añadir más listas.</p>',            
+            showConfirmButton: true,
+            confirmButtonText: 'Entendido'
+          });
+        }else {
+          this.toastr.error(error.error.message, 'Error en la creación');
+          console.error('Error en añadir la lista: ', error.error.message);
+        }
       }
     );
   }
@@ -106,11 +119,36 @@ export class GestorListasComponent {
       cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
-        //Añadir metodo de borrado
-        Swal.fire(
-          'Eliminada',
-          'La lista ha sido eliminada.',
-          'success'
+        this.service.borrarLista(this.misListas[index].id).subscribe(
+          () => {
+            this.misListas.splice(index, 1);
+            Swal.fire(
+              'Eliminada',
+              'La lista ha sido eliminada.',
+              'success'
+            );
+          },
+          error => {
+            if (error.status === 401) {
+              Swal.fire(
+                'Advertencia',
+                'No tienes permisos para eliminar la lista.',
+                'warning'
+              );
+            } else if (error.status === 400) {
+              Swal.fire(
+                'Advertencia',
+                error.error.message,
+                'warning'
+              );
+            }else {
+              Swal.fire(
+                'Error',
+                'Hubo un problema al eliminar la lista.',
+                'error'
+              );
+            }
+          }
         );
       }
     });

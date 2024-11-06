@@ -21,11 +21,15 @@ export class ListaService {
     return this.http.get<lista[]>(urlFinal);
   }
 
-  // Para crear las listas
-  crearLista(nombre : string){
-    let info = JSON.stringify({nombre: nombre, token: this.userService.getToken()});
-
-    let urlFinal = this.apiUrl + '/crearLista';
+  // Para crear una lista
+  crearLista(nombre: string) {
+    console.log(localStorage.getItem('email'));
+    const info = {nombre: nombre, 
+      token: this.userService.getToken(), 
+      email: localStorage.getItem('email')
+    };
+  
+    const urlFinal = this.apiUrl + '/crearLista';
     return this.http.post<any>(urlFinal, info);
   }
 
@@ -38,6 +42,13 @@ export class ListaService {
     });
 
     return this.http.post<any>(urlFinal, producto, { headers });
+  }
+
+  borrarLista(idLista: string): Observable<any> {
+    let info = {idLista: idLista, token: this.userService.getToken()};
+
+    let urlFinal = this.apiUrl + "/borrarLista";
+    return this.http.delete<any>(urlFinal, { body: info });
   }
   
 }
