@@ -8,28 +8,32 @@ import { InicioComponent } from './inicio/inicio.component';
 import { Login1Component } from './login1/login1.component';
 import { CookieService } from 'ngx-cookie-service';
 import { inject } from '@angular/core';
+import { UserService } from './user.service';
 
 // Guard único que controla el acceso en función de la autenticación y la ruta
 const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
+  const userService = inject(UserService); // Inyecta el servicio UserService
+  var isLogin = userService.isLoggedIn$; // Observable que indica si el usuario está logueado
   const router = inject(Router); // Inyecta el servicio Router
-  const cookie = inject(CookieService); // Inyecta el servicio CookieService
 
-  const path = route.routeConfig?.path;
-  var token = cookie.get('fakeUserId'); // Para ver si está autenticado
+  const path = route.routeConfig?.path; // Ruta actual
+  var salida = true; // Variable de salida
 
-  // Rutas protegidas que no requieren autenticación
-  if (['IniciarSesion', 'Registrarse'].includes(path!) && token) {
-    router.navigate(['/GestionarListas']);
-    return false;
-  }
+  isLogin.subscribe(isLoggedIn => {
+    if (isLoggedIn) {
+      if (['IniciarSesion', 'Registrarse'].includes(path!)) {
+        router.navigate(['/GestionarListas']);
+        salida = false 
+      }
+    } else {
+      if (['GestionarListas'].includes(path!)) {
+        router.navigate(['/IniciarSesion']);
+        salida = false
+      }
+    }
+  });
 
-  // Rutas protegidas que requieren autenticación
-  if (['GestionarListas'].includes(path!) && !token) {
-    router.navigate(['/IniciarSesion']);
-    return false;
-  }
-
-  return true; // Rutas públicas
+  return salida; 
 };
 
 export const routes: Routes = [
