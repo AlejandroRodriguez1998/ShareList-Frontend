@@ -23,32 +23,39 @@ export class ListaService {
 
   // Para crear una lista
   crearLista(nombre: string) {
-    console.log(localStorage.getItem('email'));
     const info = {nombre: nombre, 
-      token: this.userService.getToken(), 
       email: localStorage.getItem('email')
     };
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + this.userService.getToken()
+    });
   
     const urlFinal = this.apiUrl + '/crearLista';
-    return this.http.post<any>(urlFinal, info);
+    return this.http.post<any>(urlFinal, info, { headers });
   }
 
   // Para añadir productos a las listas
-  aniadirProducto(idLista: string, producto: producto) {
+  nuevoProducto(idLista: string, producto: producto) {
     let urlFinal= this.apiUrl + '/addProducto';
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'idLista': idLista  
+      'idLista': idLista,
+      'Authorization': 'Bearer ' + this.userService.getToken()
     });
 
     return this.http.post<any>(urlFinal, producto, { headers });
   }
 
   borrarLista(idLista: string): Observable<any> {
-    let info = {idLista: idLista, token: this.userService.getToken()};
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + this.userService.getToken()
+    });
 
     let urlFinal = this.apiUrl + "/borrarLista";
-    return this.http.delete<any>(urlFinal, { body: info });
+    return this.http.delete<any>(urlFinal, { body: idLista, headers });
   }
   
 }

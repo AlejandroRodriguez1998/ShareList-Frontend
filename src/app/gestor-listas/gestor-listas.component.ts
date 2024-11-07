@@ -129,26 +129,29 @@ export class GestorListasComponent {
             );
           },
           error => {
-            if (error.status === 401) {
-              Swal.fire(
-                'Advertencia',
-                'No tienes permisos para eliminar la lista.',
-                'warning'
-              );
-            } else if (error.status === 400) {
-              Swal.fire(
-                'Advertencia',
-                error.error.message,
-                'warning'
-              );
-            }else {
-              Swal.fire(
-                'Error',
-                'Hubo un problema al eliminar la lista.',
-                'error'
-              );
+            switch (error.status) {
+              case 401:
+                Swal.fire(
+                  'Advertencia',
+                  'No tienes permisos para eliminar la lista.',
+                  'warning'
+                );
+                break;
+              case 400:
+                Swal.fire(
+                  'Advertencia',
+                  error.error.message,
+                  'warning'
+                );
+                break;
+              default:
+                Swal.fire(
+                  'Error',
+                  'Hubo un problema al eliminar la lista.',
+                  'error'
+                );
             }
-          }
+          }          
         );
       }
     });
@@ -169,7 +172,7 @@ export class GestorListasComponent {
   
       this.producto.crearProducto(this.nuevoProducto, this.unidadesPedidas, this.unidadesCompradas);
   
-      this.service.aniadirProducto(this.listaSeleccionada.id, this.producto).subscribe(
+      this.service.nuevoProducto(this.listaSeleccionada.id, this.producto).subscribe(
         (response) => {
           console.log('Producto agregado correctamente:', response);
           this.nuevoProducto = '';
@@ -189,18 +192,41 @@ export class GestorListasComponent {
 
         },
         (error) => {
-          this.toastr.error(`Hubo un error al agregar el producto "${this.producto.nombre}" a la lista`, 'Error al agregar producto');
-          console.error('Error al almacenar el producto:', error);
+          switch (error.status) {
+            case 400:
+              this.toastr.error(error.error.message, 'Error al agregar producto');
+              break;
+            case 401:
+              this.toastr.error('No tienes permisos para añadir productos a esta lista', 'Error al agregar producto');
+              break;
+            case 403:
+              Swal.fire({
+                icon: 'warning',
+                title: 'Límite alcanzado',
+                html: '<p>Los usuarios <strong>no premium</strong> solo pueden tener hasta 10 productos en una lista.</p>' +
+                      '<p>Considera <a href="/Suscripcion">actualizar a premium</a> para añadir más productos.</p>',
+                showConfirmButton: true,
+                confirmButtonText: 'Entendido'
+              });
+              break;
+            case 404:
+              this.toastr.error('La lista seleccionada no existe', 'Error al agregar producto');
+              break;
+            default:
+              console.error('Error al almacenar el producto:', error);
+              this.toastr.error(`Hubo un error al agregar el producto "${this.producto.nombre}" a la lista`, 'Error al agregar producto');
+          }
         }
       );
     } else {
       if(this.nuevoProducto === ""){
-        //Añadir logica de modal y mensajes de error
+        this.toastr.error('El nombre del producto no puede estar vacío', 'Error al agregar producto');
       }else {
         this.toastr.error(`Hubo algún problema. Inténtalo de nuevo.`, 'Error al agregar producto');
         console.error('Faltan datos para crear el producto o no hay lista seleccionada');
       }
     }
   }
-
+  
 }
+
