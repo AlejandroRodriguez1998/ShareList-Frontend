@@ -32,6 +32,8 @@
               </tr>
             </tbody>
           </table>
+
+          <button *ngIf="lista.productos.length > 3" class="btn btn-link d-block mx-auto p-0" (click)="abrirModalVerMas(i)">Ver más...</button>
         </div>
         <div class="card-footer d-flex justify-content-between align-items-center">
           <!-- Sección izquierda: Usuarios -->
@@ -62,7 +64,7 @@
 
 <!-- Modal -->
 <div class="modal fade" id="productoModal" tabindex="-1" aria-labelledby="productoModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="productoModalLabel">Añadir producto a {{ listaSeleccionada?.nombre }}</h5>
@@ -81,6 +83,36 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
         <button type="button" class="btn btn-primary" (click)="agregarProducto()">Guardar Producto</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para ver todos los productos -->
+<div class="modal fade" id="verMasModal" tabindex="-1" aria-labelledby="verMasModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="verMasModalLabel">Productos de {{ listaSeleccionada?.nombre }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-sm">
+          <thead>
+            <tr class="text-center">
+              <th></th>
+              <th>Pedidas</th>
+              <th>Compradas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let producto of listaSeleccionada?.productos">
+              <td>{{ producto.nombre }}</td>
+              <td class="text-center">{{ producto.udsPedidas }}</td>
+              <td class="text-center">{{ producto.udsCompradas }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

@@ -23,7 +23,7 @@ export class GestorListasComponent {
   nombreLista?: string; // Nombre de la lista a crear
 
   // Productos
-  producto : producto = new producto;
+  producto? : producto;
   nuevoProducto : string = '';
   unidadesPedidas : number = 0;
   unidadesCompradas: number = 0;
@@ -85,7 +85,7 @@ export class GestorListasComponent {
         listaCreada.nombre = response.nombre;
 
         this.misListas.push(listaCreada);
-        this.toastr.success(`La lista "${listaCreada.nombre}" ha sido creada.`, 'Correcto');
+        this.toastr.success(`La lista "${listaCreada.nombre}" ha sido creada correctamente.`, '');
         console.log('Nueva Lista añadida', listaCreada);
       },
       (error) => {
@@ -94,7 +94,7 @@ export class GestorListasComponent {
             icon: 'warning',
             title: 'Límite alcanzado',
             html: '<p>Los usuarios <strong>no premium</strong> solo pueden tener hasta 2 listas creadas simultáneas.</p>' +
-            '<p>Considera <a href="/Suscripcion">actualizar a premium</a> para añadir más listas.</p>',            
+            '<p>Considera <a href="/Suscripcion">actualizar</a> para añadir más listas.</p>',            
             showConfirmButton: true,
             confirmButtonText: 'Entendido'
           });
@@ -104,6 +104,78 @@ export class GestorListasComponent {
         }
       }
     );
+  }
+
+  // Método para añadir un producto a la lista
+  agregarProducto() {
+    if (this.nuevoProducto && this.listaSeleccionada) {
+      const modalElement = document.getElementById('productoModal');
+      const modal = bootstrap.Modal.getInstance(modalElement);
+
+      console.log(`Voy a almacenar producto: "${this.nuevoProducto}"`);
+
+      const nuevoProducto = new producto(); // Crear una nueva instancia de producto cada vez
+      nuevoProducto.crearProducto(this.nuevoProducto, this.unidadesPedidas, this.unidadesCompradas);
+
+      this.service.nuevoProducto(this.listaSeleccionada.id, nuevoProducto).subscribe(
+        (response) => {
+          console.log('Producto agregado correctamente:', response);
+
+          const index = this.misListas.findIndex(lista => lista.id === this.listaSeleccionada!.id);
+          if (index !== -1) {
+            if (!this.misListas[index].productos) {
+              this.misListas[index].productos = []; // Inicializa el array si no está definido
+            }
+            this.misListas[index].productos.push(nuevoProducto); // Añadir el nuevo producto
+          }
+
+          // Ocultar el modal
+          modal.hide();
+          this.limpiarCamposModal();
+
+          this.toastr.success(`El producto "${nuevoProducto.nombre}" ha sido agregado a la lista`, '');
+
+        },
+        (error) => {
+          switch (error.status) {
+            case 400:
+              this.toastr.error(error.error.message, 'Error al agregar producto');
+              break;
+            case 401:
+              this.toastr.error('No tienes permisos para añadir productos a esta lista', 'Error al agregar producto');
+              break;
+            case 403:
+              Swal.fire({
+                icon: 'warning',
+                title: 'Límite alcanzado',
+                html: '<p>Los usuarios <strong>no premium</strong> solo pueden tener hasta 10 productos en una lista.</p>' +
+                      '<p>Considera <a href="/Suscripcion">actualizar</a> para añadir más productos.</p>',
+                showConfirmButton: true,
+                confirmButtonText: 'Entendido'
+              });
+              modal.hide();
+              break;
+            case 404:
+              this.toastr.error('La lista seleccionada no existe', 'Error al agregar producto');
+              break;
+            default:
+              console.error('Error al almacenar el producto:', error);
+              this.toastr.error(`Hubo un error al agregar el producto "${nuevoProducto.nombre}" a la lista`, 'Error al agregar producto');
+          }
+
+          this.limpiarCamposModal();
+        }
+      );
+    } else {
+      if (this.nuevoProducto === "") {
+        this.toastr.error('El nombre del producto no puede estar vacío.', 'Error al agregar producto');
+      } else {
+        this.toastr.error(`Hubo algún problema. Inténtalo de nuevo.`, 'Error al agregar producto');
+        console.error('Faltan datos para crear el producto o no hay lista seleccionada');
+      }
+
+      this.limpiarCamposModal();
+    }
   }
 
   // Método para eliminar una lista
@@ -165,67 +237,18 @@ export class GestorListasComponent {
     modal.show();
   }
 
-  // Método para añadir un producto a la lista
-  agregarProducto() {
-    if (this.nuevoProducto && this.listaSeleccionada) {
-      console.log(`Voy a almacenar producto: "${this.nuevoProducto}"`);
-  
-      this.producto.crearProducto(this.nuevoProducto, this.unidadesPedidas, this.unidadesCompradas);
-  
-      this.service.nuevoProducto(this.listaSeleccionada.id, this.producto).subscribe(
-        (response) => {
-          console.log('Producto agregado correctamente:', response);
-          this.nuevoProducto = '';
-  
-          const index = this.misListas.findIndex(lista => lista.id === this.listaSeleccionada!.id);
-          if (index !== -1) {
-            if (this.misListas[index].productos) {
-              this.misListas[index].productos.push(this.producto);
-            }
-          }
+  // Método para abrir el modal de ver más
+  abrirModalVerMas(indice: number) {
+    this.listaSeleccionada = this.misListas[indice];
+    const modalElement = document.getElementById('verMasModal');
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+  }
 
-          const modalElement = document.getElementById('productoModal');
-          const modal = bootstrap.Modal.getInstance(modalElement);
-          modal.hide();
-
-          this.toastr.success(`El producto "${this.producto.nombre}" ha sido agregado a la lista`, 'Producto agregado correctamente');
-
-        },
-        (error) => {
-          switch (error.status) {
-            case 400:
-              this.toastr.error(error.error.message, 'Error al agregar producto');
-              break;
-            case 401:
-              this.toastr.error('No tienes permisos para añadir productos a esta lista', 'Error al agregar producto');
-              break;
-            case 403:
-              Swal.fire({
-                icon: 'warning',
-                title: 'Límite alcanzado',
-                html: '<p>Los usuarios <strong>no premium</strong> solo pueden tener hasta 10 productos en una lista.</p>' +
-                      '<p>Considera <a href="/Suscripcion">actualizar a premium</a> para añadir más productos.</p>',
-                showConfirmButton: true,
-                confirmButtonText: 'Entendido'
-              });
-              break;
-            case 404:
-              this.toastr.error('La lista seleccionada no existe', 'Error al agregar producto');
-              break;
-            default:
-              console.error('Error al almacenar el producto:', error);
-              this.toastr.error(`Hubo un error al agregar el producto "${this.producto.nombre}" a la lista`, 'Error al agregar producto');
-          }
-        }
-      );
-    } else {
-      if(this.nuevoProducto === ""){
-        this.toastr.error('El nombre del producto no puede estar vacío', 'Error al agregar producto');
-      }else {
-        this.toastr.error(`Hubo algún problema. Inténtalo de nuevo.`, 'Error al agregar producto');
-        console.error('Faltan datos para crear el producto o no hay lista seleccionada');
-      }
-    }
+  // Método para limpiar los campos del modal
+  limpiarCamposModal() {
+    this.nuevoProducto = '';
+    this.unidadesPedidas = 0;
   }
   
 }
