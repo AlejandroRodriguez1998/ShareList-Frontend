@@ -30,7 +30,8 @@
                 <td class="text-center">{{ producto.udsPedidas }}</td>
                 <td class="text-center">
                   <input type="number" [(ngModel)]="producto.udsCompradas" 
-                    (focus)="almacenarValorOriginal(producto)"
+                    (focus)="almacenarValoresOriginales(producto)"
+                    
                     (change)="actualizarCantidadComprada(producto, i, j)" 
                     min="0" [max]="producto.udsPedidas" class="form-control form-control-sm" />
                 </td>
@@ -47,7 +48,7 @@
         
           <!-- Sección derecha: Botones -->
           <div class="acciones">    
-            <span class="icono me-3" style="cursor: pointer;">
+            <span class="icono me-3" (click)="generarEnlaceInvitacion(i)" style="cursor: pointer;">
               <i class="bi bi-share"></i>
             </span>
 
@@ -119,7 +120,7 @@
               <td class="text-center">{{ producto.udsPedidas }}</td>
               <td class="text-center">
                 <input type="number" [(ngModel)]="producto.udsCompradas" 
-                  (focus)="almacenarValorOriginal(producto)"
+                  (focus)="almacenarValoresOriginales(producto)"
                   (change)="actualizarCantidadComprada(producto, indiceListaSeleccionada, j)" 
                   min="0" [max]="producto.udsPedidas" class="form-control form-control-sm" />
               </td>
@@ -145,23 +146,25 @@
             <tr>
               <th>Producto</th>
               <th>Pedidas</th>
-              <th>Compradas</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let producto of listaSeleccionada?.productos; let j = index">
               <td>
-                <input type="text" [(ngModel)]="producto.nombre" (change)="actualizarProducto(indiceListaSeleccionada)" class="form-control form-control-sm" />
+                <input type="text" [(ngModel)]="producto.nombre"
+                (focus)="almacenarValoresOriginales(producto)"
+                (change)="actualizarProducto(producto, indiceListaSeleccionada)"
+                class="form-control form-control-sm" />
               </td>
               <td>
-                <input type="number" [(ngModel)]="producto.udsPedidas" (change)="actualizarProducto(indiceListaSeleccionada)" min="0" class="form-control form-control-sm" />
-              </td>
-              <td>
-                <input type="number" [(ngModel)]="producto.udsCompradas" (change)="actualizarProducto(indiceListaSeleccionada)" min="0" [max]="producto.udsPedidas" class="form-control form-control-sm" />
+                <input type="number" [(ngModel)]="producto.udsPedidas" 
+                (focus)="almacenarValoresOriginales(producto)"
+                (change)="actualizarProducto(producto, indiceListaSeleccionada)" 
+                min="0" class="form-control form-control-sm" />
               </td>
               <td class="text-center align-middle">
-                <span class="icono" (click)="eliminarProducto(producto.id)" style="cursor: pointer;">
+                <span class="icono" (click)="eliminarProducto(producto.id, indiceListaSeleccionada, j)" style="cursor: pointer;">
                   <i class="bi bi-trash"></i>
                 </span>
               </td>

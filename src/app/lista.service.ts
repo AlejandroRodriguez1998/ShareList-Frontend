@@ -49,7 +49,6 @@ export class ListaService {
   }
 
   actualizarProductoComprado(idProducto: string, udsCompradas: number): Observable<any> {
-    console.log(idProducto)
     let info = { idProducto: idProducto, udsCompradas: udsCompradas };
   
     const headers = new HttpHeaders({
@@ -79,6 +78,16 @@ export class ListaService {
 
     let urlFinal = this.apiUrl + "/borrarLista";
     return this.http.delete<any>(urlFinal, { body: idLista, headers });
+  }
+
+  eliminarProducto(idProducto: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + this.userService.getToken()
+    });
+  
+    let urlFinal = this.apiUrl + '/borrarProducto';
+    return this.http.delete<any>(urlFinal, {body: idProducto, headers });
   }
   
 }

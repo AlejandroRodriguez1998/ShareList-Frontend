@@ -3,12 +3,12 @@ import { Routes, CanActivateFn, Router, ActivatedRouteSnapshot } from '@angular/
 import { SobreNosotrosComponent } from './sobre-nosotros/sobre-nosotros.component';
 import { GestorListasComponent } from './gestor-listas/gestor-listas.component';
 import { SuscripcionComponent } from './suscripcion/suscripcion.component';
+import { InvitacionComponent } from './invitacion/invitacion.component';
 import { Registrar1Component } from './registrar1/registrar1.component';
 import { InicioComponent } from './inicio/inicio.component';
 import { Login1Component } from './login1/login1.component';
-import { CookieService } from 'ngx-cookie-service';
-import { inject } from '@angular/core';
 import { UserService } from './user.service';
+import { inject } from '@angular/core';
 
 // Guard único que controla el acceso en función de la autenticación y la ruta
 const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
@@ -26,7 +26,7 @@ const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
         salida = false 
       }
     } else {
-      if (['GestionarListas'].includes(path!)) {
+      if (['GestionarListas',].includes(path!)) {
         router.navigate(['/IniciarSesion']);
         salida = false
       }
@@ -42,6 +42,7 @@ export const routes: Routes = [
   { path: 'Registrarse', component: Registrar1Component, canActivate: [authGuard] },
   { path: 'Suscripcion', component: SuscripcionComponent },
   { path: 'GestionarListas', component: GestorListasComponent, canActivate: [authGuard] },
+  { path: 'Invitacion', component: InvitacionComponent },
   { path: 'SobreNosotros', component: SobreNosotrosComponent },
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
