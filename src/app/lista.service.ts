@@ -48,6 +48,29 @@ export class ListaService {
     return this.http.post<any>(urlFinal, producto, { headers });
   }
 
+  actualizarProductoComprado(idProducto: string, udsCompradas: number): Observable<any> {
+    console.log(idProducto)
+    let info = { idProducto: idProducto, udsCompradas: udsCompradas };
+  
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + this.userService.getToken()
+    });
+  
+    let urlFinal = this.apiUrl + '/comprar';
+    return this.http.put<any>(urlFinal, info, { headers });
+  }
+
+  actualizarLista(lista: lista): Observable<lista> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + this.userService.getToken()
+    });
+    
+    let urlFinal = this.apiUrl + "/actualizarLista";
+    return this.http.put<lista>(urlFinal, lista, { headers });
+  }
+
   borrarLista(idLista: string): Observable<any> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',

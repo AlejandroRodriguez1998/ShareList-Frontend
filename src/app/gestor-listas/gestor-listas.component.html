@@ -25,10 +25,15 @@
             </thead>
             <tbody>
               <!-- Muestra hasta un máximo de 3 productos -->
-              <tr *ngFor="let producto of lista.productos.slice(0, 3)">
+              <tr *ngFor="let producto of lista.productos.slice(0, 3); let j = index">
                 <td>{{ producto.nombre }}</td>
                 <td class="text-center">{{ producto.udsPedidas }}</td>
-                <td class="text-center">{{ producto.udsCompradas }}</td>
+                <td class="text-center">
+                  <input type="number" [(ngModel)]="producto.udsCompradas" 
+                    (focus)="almacenarValorOriginal(producto)"
+                    (change)="actualizarCantidadComprada(producto, i, j)" 
+                    min="0" [max]="producto.udsPedidas" class="form-control form-control-sm" />
+                </td>
               </tr>
             </tbody>
           </table>
@@ -41,14 +46,17 @@
           </div>
         
           <!-- Sección derecha: Botones -->
-          <div class="acciones">
-            <span class="icono me-3" (click)="abrirModal(i)" style="cursor: pointer;">
+          <div class="acciones">    
+            <span class="icono me-3" style="cursor: pointer;">
+              <i class="bi bi-share"></i>
+            </span>
+
+            <span class="icono me-3" (click)="abrirModalAgregarProducto(i)" style="cursor: pointer;">
               <i class="bi bi-plus-circle"></i>
             </span>
         
-            <!-- Icono de carrito de compras -->
-            <span class="icono me-3" style="cursor: pointer;">
-              <i class="bi bi-cart"></i>
+            <span class="icono me-3" (click)="editarModal(i)" style="cursor: pointer;">
+              <i class="bi bi-pen"></i>
             </span>
         
             <!-- Icono de eliminar -->
@@ -62,7 +70,7 @@
   </div>
 </div>
 
-<!-- Modal -->
+<!-- Modal para agregar productos -->
 <div class="modal fade" id="productoModal" tabindex="-1" aria-labelledby="productoModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -106,10 +114,57 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let producto of listaSeleccionada?.productos">
+            <tr *ngFor="let producto of listaSeleccionada?.productos; let j = index">
               <td>{{ producto.nombre }}</td>
               <td class="text-center">{{ producto.udsPedidas }}</td>
-              <td class="text-center">{{ producto.udsCompradas }}</td>
+              <td class="text-center">
+                <input type="number" [(ngModel)]="producto.udsCompradas" 
+                  (focus)="almacenarValorOriginal(producto)"
+                  (change)="actualizarCantidadComprada(producto, indiceListaSeleccionada, j)" 
+                  min="0" [max]="producto.udsPedidas" class="form-control form-control-sm" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para editar los productos en la lista -->
+<div class="modal fade" id="editarProductosModal" tabindex="-1" aria-labelledby="editarProductosModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editarProductosModalLabel">Editar productos de {{ listaSeleccionada?.nombre }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Pedidas</th>
+              <th>Compradas</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let producto of listaSeleccionada?.productos; let j = index">
+              <td>
+                <input type="text" [(ngModel)]="producto.nombre" (change)="actualizarProducto(indiceListaSeleccionada)" class="form-control form-control-sm" />
+              </td>
+              <td>
+                <input type="number" [(ngModel)]="producto.udsPedidas" (change)="actualizarProducto(indiceListaSeleccionada)" min="0" class="form-control form-control-sm" />
+              </td>
+              <td>
+                <input type="number" [(ngModel)]="producto.udsCompradas" (change)="actualizarProducto(indiceListaSeleccionada)" min="0" [max]="producto.udsPedidas" class="form-control form-control-sm" />
+              </td>
+              <td class="text-center align-middle">
+                <span class="icono" (click)="eliminarProducto(producto.id)" style="cursor: pointer;">
+                  <i class="bi bi-trash"></i>
+                </span>
+              </td>
             </tr>
           </tbody>
         </table>
