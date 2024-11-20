@@ -19,6 +19,7 @@ declare var bootstrap: any; // Para usar los modales de Bootstrap
 })
 export class GestorListasComponent {
 
+  propietario: string = localStorage.getItem('email')!; // Propietario de las listas
   valoresOriginales: { [idProducto: string]: Partial<producto> } = {};
 
   listaSeleccionada?: lista; // Lista seleccionada para añadir productos
@@ -32,8 +33,6 @@ export class GestorListasComponent {
   unidadesPedidas : number = 0;
   unidadesCompradas: number = 0;
   
-  enlaceInvitacion: string = ''; // Enlace de invitación para compartir
-
   // Websocket para listas compartidas
   ws : WebSocket = new WebSocket('ws://localhost/wsLista?email=' + localStorage.getItem('email'));
 
@@ -50,15 +49,46 @@ export class GestorListasComponent {
     }
 
     // Eventos del websocket - Mensaje recibido
-    this.ws.onmessage = function(event){
+    this.ws.onmessage = (event) => {
       console.log('Mensaje recibido:', event.data);
-
+    
       let data = JSON.parse(event.data);
+    
+      const index = this.misListas.findIndex(lista => lista.id === data.idLista);
+      if (index !== -1) {
+        if (data.tipo == "nuevoProducto") {
+          const productoYaExiste = this.misListas[index].productos.some(producto => producto.id === data.idProducto);
 
-      if (data.tipo == "actualizacion"){
-        console.log(data.nombre);
+          if (!productoYaExiste) {
+            let nuevoProducto = new producto();
+            nuevoProducto.crearProducto(data.nombre, data.udsPedidas, data.udsCompradas);
+            nuevoProducto.id = data.idProducto;
+  
+            this.misListas[index].productos.unshift(nuevoProducto); 
+          }
+        }
+
+        if (data.tipo == "actualizacionProducto"){
+          const indexProducto = this.misListas[index].productos.findIndex(producto => producto.id === data.idProducto);
+          if (indexProducto !== -1) {
+            this.misListas[index].productos[indexProducto].nombre = data.nombre;
+            this.misListas[index].productos[indexProducto].udsPedidas = data.udsPedidas;
+            this.misListas[index].productos[indexProducto].udsCompradas = data.udsCompradas;
+          }
+        }
+
+        if (data.tipo == "borradoLista"){
+          this.misListas.splice(index, 1);
+        }
+
+        if (data.tipo == "borradoProducto"){
+          const indexProducto = this.misListas[index].productos.findIndex(producto => producto.id === data.idProducto);
+          if (indexProducto !== -1) {
+            this.misListas[index].productos.splice(indexProducto, 1);
+          }
+        }
       }
-    }
+    };
   }
 
   // Método que se ejecuta al cargar el componente
@@ -95,8 +125,7 @@ export class GestorListasComponent {
     this.service.crearLista(this.nombreLista!).subscribe(
       (response) => {
         let listaCreada = new lista();
-        listaCreada.id = response.id;
-        listaCreada.nombre = response.nombre;
+        listaCreada.inicializar(response.nombre!, response.id, response.propietario);
 
         this.misListas.push(listaCreada);
 
@@ -365,19 +394,14 @@ export class GestorListasComponent {
   generarEnlaceInvitacion(indexLista: number) {
     const lista = this.misListas[indexLista];
 
-    console.log(lista.id)
-
     this.invitacionService.generarInvitacion(lista.id).subscribe(
-      (token) => {
-        // Guarda el enlace generado en una variable para mostrarlo en el modal
-        this.enlaceInvitacion = window.location.origin + "/Invitacion?token=" + token;
-
+      (urlInvitacion) => {
         // Mostrar el enlace en un SweetAlert
         Swal.fire({
           title: 'Enlace de invitación',
           html: `
             <p>Comparte este enlace para invitar a alguien a tu lista:</p>
-            <input id="enlaceInvitacion" type="text" class="form-control" value="${this.enlaceInvitacion}" readonly>
+            <input id="enlaceInvitacion" type="text" class="form-control" value="${urlInvitacion}" readonly>
             <button id="copiarEnlaceBtn" class="btn btn-primary mt-3">Copiar enlace</button>
           `,
           showConfirmButton: false,

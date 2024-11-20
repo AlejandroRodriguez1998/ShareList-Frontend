@@ -47,8 +47,10 @@
           </div>
         
           <!-- Sección derecha: Botones -->
-          <div class="acciones">    
-            <span class="icono me-3" (click)="generarEnlaceInvitacion(i)" style="cursor: pointer;">
+          <div class="acciones">   
+            <span class="icono me-3"
+            *ngIf="lista.propietario === propietario" 
+            (click)="generarEnlaceInvitacion(i)" style="cursor: pointer;">
               <i class="bi bi-share"></i>
             </span>
 
@@ -56,12 +58,15 @@
               <i class="bi bi-plus-circle"></i>
             </span>
         
-            <span class="icono me-3" (click)="editarModal(i)" style="cursor: pointer;">
+            <span class="icono me-3" 
+            (click)="editarModal(i)" style="cursor: pointer;">
               <i class="bi bi-pen"></i>
             </span>
         
             <!-- Icono de eliminar -->
-            <span class="icono" (click)="eliminarLista(i)" style="cursor: pointer;">
+            <span class="icono" 
+            *ngIf="lista.propietario === propietario"
+            (click)="eliminarLista(i)" style="cursor: pointer;">
               <i class="bi bi-trash"></i>
             </span>
           </div>
