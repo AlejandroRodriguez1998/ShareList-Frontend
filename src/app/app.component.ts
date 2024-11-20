@@ -13,10 +13,7 @@ import { Observable } from "rxjs";
   standalone: true,
   imports: [RouterModule,
     CommonModule,
-    RouterOutlet, 
-    Registrar1Component,
-    Login1Component, 
-    GestorListasComponent],
+    RouterOutlet, ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

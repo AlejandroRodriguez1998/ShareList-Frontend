@@ -60,14 +60,14 @@ export class ListaService {
     return this.http.put<any>(urlFinal, info, { headers });
   }
 
-  actualizarLista(lista: lista): Observable<lista> {
+  actualizarProducto(producto: producto): Observable<any> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + this.userService.getToken()
     });
     
-    let urlFinal = this.apiUrl + "/actualizarLista";
-    return this.http.put<lista>(urlFinal, lista, { headers });
+    let urlFinal = this.apiUrl + "/actualizarProducto";
+    return this.http.put<any>(urlFinal, producto, { headers });
   }
 
   borrarLista(idLista: string): Observable<any> {

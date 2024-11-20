@@ -335,10 +335,15 @@ export class GestorListasComponent {
 
     if (this.listaSeleccionada) {
       // Llama al servicio para actualizar la lista
-      this.service.actualizarLista(this.listaSeleccionada).subscribe(
-        response => {
+      this.service.actualizarProducto(producto).subscribe(
+        (response: producto) => {
           this.toastr.success('Producto actualizado correctamente');
-          this.misListas[indexLista] = response;
+          // Actualiza el producto en la lista local
+          const lista = this.misListas[indexLista];
+          const indexProducto = lista.productos.findIndex(p => p.id === producto.id);
+          if (indexProducto !== -1) {
+            lista.productos[indexProducto] = response;
+          }
         },
         error => {
           console.error('Error al actualizar el producto:', error);
@@ -422,8 +427,19 @@ export class GestorListasComponent {
         });
       },
       (error) => {
-        console.error('Error al generar el enlace de invitación:', error);
-        this.toastr.error('No se pudo generar el enlace de invitación', 'Error');
+        if (error.status === 403) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Límite alcanzado',
+            html: '<p>Los usuarios <strong>no premium</strong> solo pueden tener hasta una invitación.</p>' +
+            '<p>Considera <a href="/Suscripcion">actualizar</a> para añadir más invitaciones.</p>',
+            showConfirmButton: true,
+            confirmButtonText: 'Entendido'
+          });
+        } else {
+          console.error('Error al generar el enlace de invitación:', error);
+          this.toastr.error('No se pudo generar el enlace de invitación', 'Error');
+        }
       }
     );
   }

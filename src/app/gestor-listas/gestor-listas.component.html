@@ -58,7 +58,7 @@
               <i class="bi bi-plus-circle"></i>
             </span>
         
-            <span class="icono me-3" 
+            <span [ngClass]="{'me-3': lista.propietario === propietario}" 
             (click)="editarModal(i)" style="cursor: pointer;">
               <i class="bi bi-pen"></i>
             </span>

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 
 @Injectable({
@@ -56,6 +56,17 @@ export class UserService {
     let urlFinal = this.apiUrl + '/logout'
     return this.http.get<any>(urlFinal, { withCredentials: true })
     .pipe(tap(() => { this.updateLoginStatus(false); }));
+  }
+
+  //Para cambiarle a premium
+  changeToPremium(){
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + this.getToken()
+    });
+
+    let urlFinal = this.apiUrl + '/premium'
+    return this.http.get<any>(urlFinal, { headers, withCredentials: true })
   }
 
 }
