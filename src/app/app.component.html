@@ -12,31 +12,33 @@
     </button>
 
     <!-- Menú colapsable -->
-    <div class="collapse navbar-collapse" id="navbarMenu">
-      <!-- Enlaces del lado izquierdo -->
-      <ul class="navbar-nav mx-auto">
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/">Inicio</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/SobreNosotros">Sobre Nosotros</a>
-        </li>
-      </ul>
+    <div class="collapse navbar-collapse " id="navbarMenu">
+      <div class="container d-inline d-lg-flex justify-content-center align-items-center">
+        <!-- Enlaces del lado izquierdo -->
+        <ul class="navbar-nav">
+          <li class="nav-item mx-3">
+            <a class="nav-link" routerLink="/">Inicio</a>
+          </li>
+          <li class="nav-item mx-3">
+            <a class="nav-link" routerLink="/SobreNosotros">Sobre Nosotros</a>
+          </li>
+        </ul>
 
-      <!-- Logo centrado -->
-      <a class="d-none d-lg-block" routerLink="/">
-        <img src="logo.png" alt="Logo" width="80" height="80">
-      </a>
+        <!-- Logo centrado -->
+        <a class="d-none d-lg-block mx-3" routerLink="/">
+          <img src="logo.png" alt="Logo" width="80" height="80">
+        </a>
 
-      <!-- Enlaces del lado derecho -->
-      <ul class="navbar-nav mx-auto">
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/Suscripcion">Suscripción</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/GestionarListas">Gestionar Listas</a>
-        </li>
-      </ul>
+        <!-- Enlaces del lado derecho -->
+        <ul class="navbar-nav">
+          <li class="nav-item mx-3">
+            <a class="nav-link " routerLink="/Suscripcion">Suscripción</a>
+          </li>
+          <li class="nav-item mx-3">
+            <a class="nav-link" routerLink="/GestionarListas">Mis Listas</a>
+          </li>
+        </ul>
+      </div>
     </div>
 
     <!-- Botones pegados a la derecha -->
