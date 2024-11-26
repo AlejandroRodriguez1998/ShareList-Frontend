@@ -17,7 +17,7 @@ Esta aplicación es responsive en todos los dispositivos, con un diseño bonito 
 ## :construction_worker: Creadores
 
 - Alejandro Paniagua Rodríguez
-- Andrés González Valera
+- Andrés González Varela
 - José Lara Navarro
 
 ## :computer: Módulos
@@ -38,7 +38,7 @@ Aquí tienes un [video]() haciéndote un tour por la aplicación. (Se subirá pr
 ## 🛠️ Ejecución
 
 - Para ejecutar la aplicación lanzamos el siguiente comando:
-  - ng serve --open
+  - ng serve --ssl --ssl-key src/ssl/localhost.key --ssl-cert src/ssl/localhost.crt
 
 > [!WARNING]
 > Es importante que antes hagas *npm install* para instalar los modulos y que funcione correctamente.

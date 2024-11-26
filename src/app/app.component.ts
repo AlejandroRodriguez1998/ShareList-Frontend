@@ -21,19 +21,15 @@ export class AppComponent{
   title = 'ShareList'; // Título de la página
   isLogin$!: Observable<boolean>; // Observable para saber si el usuario está logueado
 
-  constructor(private userService : UserService, 
+  constructor(
+    private userService : UserService, 
     private router: Router, 
-    private cookie : CookieService) 
-  {
+    private cookieService : CookieService) {
+
     // Se suscribe al observable para saber si el usuario está logueado
     this.isLogin$ = this.userService.isLoggedIn$;
     // Comprueba la cookie del usuario
-    this.userService.checkCookie().subscribe(
-      token => {
-        console.log('Token recibido:', token);
-        this.userService.updateLoginStatus(true);
-      }
-    );
+    this.userService.checkSession();
   }
   
   // Método para cerrar sesión
@@ -41,7 +37,7 @@ export class AppComponent{
     // Llama al servicio para cerrar sesión
     this.userService.logout().subscribe(
       response => { // Si se ha cerrado sesión correctamente
-        this.userService.updateLoginStatus(false); 
+        //this.userService.updateLoginStatus(false); 
         this.router.navigate(['/']); 
       }
     );

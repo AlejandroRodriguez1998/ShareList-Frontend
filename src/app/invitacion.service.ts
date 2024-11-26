@@ -13,24 +13,24 @@ export class InvitacionService {
   constructor(private http:HttpClient, private userService: UserService) { }
 
   generarInvitacion(idLista: string): Observable<string> {
-    const headers = new HttpHeaders({
+    /*const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + this.userService.getToken()
-    });
+    });*/
   
     let urlFinal = this.apiUrl + '/generarInvitacion';
-    return this.http.post<string>(urlFinal, idLista, {responseType: 'text' as 'json', headers });
+    return this.http.post<string>(urlFinal, idLista, {responseType: 'text' as 'json', withCredentials: true});
   }
 
   unirseLista(token: string): Observable<any> {
     let info = { token: token, email: localStorage.getItem('email') };
 
-    const headers = new HttpHeaders({
+    /*const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + this.userService.getToken()
-    });
+    });*/
   
     let urlFinal = this.apiUrl + '/aceptarInvitacion';
-    return this.http.post<any>(urlFinal, info, { headers });
+    return this.http.post<any>(urlFinal, info, { withCredentials: true });
   }
 }

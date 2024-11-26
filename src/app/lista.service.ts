@@ -13,12 +13,12 @@ export class ListaService {
 
   private apiUrl = 'http://localhost:80/lista'; // URL de la API
 
-  constructor(private http:HttpClient, private userService : UserService) {}
+  constructor(private http:HttpClient) {}
 
   // Para obtener las listas
   obtenerListas(): Observable<lista[]> {
     let urlFinal = this.apiUrl + '/obtenerListas?email=' + localStorage.getItem('email');
-    return this.http.get<lista[]>(urlFinal);
+    return this.http.get<lista[]>(urlFinal, {withCredentials: true} );
   }
 
   // Para crear una lista
@@ -27,67 +27,44 @@ export class ListaService {
       email: localStorage.getItem('email')
     };
 
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + this.userService.getToken()
-    });
   
     const urlFinal = this.apiUrl + '/crearLista';
-    return this.http.post<any>(urlFinal, info, { headers });
+    return this.http.post<any>(urlFinal, info, { withCredentials: true });
   }
 
   // Para añadir productos a las listas
   nuevoProducto(idLista: string, producto: producto) {
     let urlFinal= this.apiUrl + '/addProducto';
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'idLista': idLista,
-      'Authorization': 'Bearer ' + this.userService.getToken()
-    });
 
-    return this.http.post<any>(urlFinal, producto, { headers });
+    const body = {idLista, producto};
+
+
+    return this.http.post<any>(urlFinal, body, { withCredentials: true });
   }
 
   actualizarProductoComprado(idProducto: string, udsCompradas: number): Observable<any> {
     let info = { idProducto: idProducto, udsCompradas: udsCompradas };
   
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + this.userService.getToken()
-    });
-  
     let urlFinal = this.apiUrl + '/comprar';
-    return this.http.put<any>(urlFinal, info, { headers });
+    return this.http.put<any>(urlFinal, info, { withCredentials: true });
   }
 
   actualizarProducto(producto: producto): Observable<any> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + this.userService.getToken()
-    });
-    
+
     let urlFinal = this.apiUrl + "/actualizarProducto";
-    return this.http.put<any>(urlFinal, producto, { headers });
+    return this.http.put<any>(urlFinal, producto, { withCredentials: true });
   }
 
   borrarLista(idLista: string): Observable<any> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + this.userService.getToken()
-    });
 
     let urlFinal = this.apiUrl + "/borrarLista";
-    return this.http.delete<any>(urlFinal, { body: idLista, headers });
+    return this.http.delete<any>(urlFinal, { body: idLista, withCredentials: true });
   }
 
   eliminarProducto(idProducto: string): Observable<any> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + this.userService.getToken()
-    });
-  
+
     let urlFinal = this.apiUrl + '/borrarProducto';
-    return this.http.delete<any>(urlFinal, {body: idProducto, headers });
+    return this.http.delete<any>(urlFinal, {body: idProducto, withCredentials: true});
   }
   
 }
