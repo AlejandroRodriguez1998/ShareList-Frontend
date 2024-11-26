@@ -58,7 +58,8 @@ export class UserService {
     let info = {email : email, pwd1 : pw1, pwd2 : pw2}
 
     let urlFinal = this.apiUrl + '/registrar1'
-    return this.http.post<any>(urlFinal,info)
+    // Tenemos que poner withCredentials a false porque si no, da un error de CORS
+    return this.http.post<any>(urlFinal,info, { withCredentials: false })
   }
 
   // Inicio de sesión
