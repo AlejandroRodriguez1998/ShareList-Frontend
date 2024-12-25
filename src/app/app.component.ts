@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { UserService } from './user.service';
 import { Component } from '@angular/core';
 import { Observable } from "rxjs";
+import { error } from "console";
 
 @Component({
   selector: 'app-root',
@@ -19,18 +20,26 @@ import { Observable } from "rxjs";
 })
 export class AppComponent{
   title = 'ShareList'; // Título de la página
-  isLogin$!: Observable<boolean>; // Observable para saber si el usuario está logueado
+  isLogin$: Observable<boolean | null>;
+  sessionChecked? : boolean; // Variable para saber si la sesión ha sido verificada
 
-  constructor(
-    private userService : UserService, 
-    private router: Router, 
-    private cookieService : CookieService) {
-
-    // Se suscribe al observable para saber si el usuario está logueado
+  constructor(private userService : UserService, private router: Router) {
+    // Inicializa la variable isLogin$ con el valor de isLoggedIn$ del servicio
     this.isLogin$ = this.userService.isLoggedIn$;
-    // Comprueba la cookie del usuario
-    this.userService.checkSession();
+
+    // Nos suscribimos a sessionChecked$
+    this.userService.sessionChecked$.subscribe(checked => {
+      console.log('[AppComponent] sessionChecked ha cambiado a:', checked);
+      this.sessionChecked = checked;
+    });
+
   }
+
+  ngOnInit() {
+    console.log('[AppComponent] ngOnInit llamado.');
+    // No es necesario llamar a checkSession aquí porque ya se llama en APP_INITIALIZER
+  }
+  
   
   // Método para cerrar sesión
   logout() {
@@ -38,7 +47,11 @@ export class AppComponent{
     this.userService.logout().subscribe(
       response => { // Si se ha cerrado sesión correctamente
         //this.userService.updateLoginStatus(false); 
+        console.log('Logout exitoso:', response); // Log añadido
         this.router.navigate(['/']); 
+      },
+      error => { // Si ha habido un error al cerrar sesión
+        console.log('Error al cerrar sesión:', error); //
       }
     );
   }

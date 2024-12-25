@@ -1,57 +1,74 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, catchError, mapTo, Observable, of, tap, throwError } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
+import { error } from 'console';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
-  private isLoggedInSubject = new BehaviorSubject<boolean>(false); // Para saber si está logueado
+  private isLoggedInSubject = new BehaviorSubject<boolean | null>(null); // Inicializado como null
   isLoggedIn$ = this.isLoggedInSubject.asObservable(); // Variable publica para saber si está logueado
 
   private apiUrl = 'https://localhost:9000/users' // URL de la API
   private token: string | null = null; // Token de autenticación
 
+  private sessionCheckedSubject = new BehaviorSubject<boolean>(false);
+  sessionChecked$ = this.sessionCheckedSubject.asObservable();
+
   constructor(private http:HttpClient, private cookieService: CookieService) {}
 
   // Para actualizar el estado de login
   updateLoginStatus(isLoggedIn: boolean) {
+    console.log('Actualizando estado de login a:', isLoggedIn); 
     this.isLoggedInSubject.next(isLoggedIn);
   }
 
   // Obtenemos la cookie desde el servicio de cookies
   getToken() {
-    return this.cookieService.get('token');
+    const token = this.cookieService.get('token');
+    console.log('Token obtenido de cookies:', token);
+    return token;
   };
   
-  // Comprueba si hay una cookie de sesión válida
   checkCookie(): Observable<any> {
-    let urlFinal = this.apiUrl + '/checkCookie';
-    return this.http.get<any>(urlFinal, { withCredentials: true })
-      .pipe(tap(response => {
-        if (response.isValid) {
-          this.updateLoginStatus(true);
-        }
-      }));
+    const urlFinal = this.apiUrl + '/checkCookie';
+    console.log("[checkCookie] Llamando a checkCookie en:", urlFinal);
+    return this.http.get<string>(urlFinal, { responseType: 'text' as 'json', withCredentials: true })      
+    .pipe(tap(token => { 
+      this.token = token;
+      //this.updateLoginStatus(true);
+      console.log('[checkCookie] Token obtenido en checkCookie:', token);
+    }));
   }
+  
+// Método para verificar el estado de la sesión al cargar la aplicación
+checkSession(): Observable<boolean> {
+  console.log(" [checkSession] Iniciando verificación de sesión...");
+  return new Observable<boolean>((observer) => {
+    this.checkCookie().subscribe({
+      next: (response) => {
+        console.log("[checkSession] Respuesta del servidor en checkCookie:", response);
+        this.updateLoginStatus(true);
+        this.sessionCheckedSubject.next(true);
+        observer.next(true);
+        observer.complete();
+      },
+      error: (error) => {
+        console.error("[checkSession] Error al verificar la cookie:", error);
+        this.updateLoginStatus(false);
+        this.sessionCheckedSubject.next(true);
+        observer.next(false);
+        observer.complete();
+      }
+    });
+  });
+}
 
-    // Método para verificar el estado de la sesión al cargar la aplicación
-    checkSession(): void {
-      this.checkCookie().subscribe(
-        (response) => {
-          if (response.isValid) {
-            this.updateLoginStatus(true);
-          } else {
-            this.updateLoginStatus(false);
-          }
-        },
-        (error) => {
-          this.updateLoginStatus(false);
-        }
-      );
-    }
+
 
   // Para registrar un usuario
   register(email : String, pw1 : String, pw2 : String){
@@ -67,10 +84,8 @@ export class UserService {
     let info = { email: email, pwd: pw };
 
     let urlFinal = this.apiUrl + '/login1';
-    return this.http.put<any>(urlFinal, info, { withCredentials: true })
-      .pipe(tap(response => {
-        this.updateLoginStatus(true);
-      }));
+    return this.http.put<any>(urlFinal, info,  { responseType: 'text' as 'json', withCredentials : true})
+    .pipe(tap(() => { this.updateLoginStatus(true); }));
   }
 
   // Para desloguear un usuario
