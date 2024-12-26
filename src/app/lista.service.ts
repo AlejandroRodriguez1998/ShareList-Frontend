@@ -27,7 +27,6 @@ export class ListaService {
       email: localStorage.getItem('email')
     };
 
-  
     const urlFinal = this.apiUrl + '/crearLista';
     return this.http.post<any>(urlFinal, info, { withCredentials: true });
   }

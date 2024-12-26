@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Component } from '@angular/core';
 import Swal from 'sweetalert2';
 import { UserService } from '../user.service';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-suscripcion',
@@ -32,9 +33,7 @@ export class SuscripcionComponent {
 
   // Funcion para abrir el modal de Stripe
   abrirModalStripe() {
-    var isLogin = this.userService.isLoggedIn$
-
-    isLogin.subscribe(isLoggedIn => {
+    this.userService.isLoggedIn$.pipe(take(1)).subscribe(isLoggedIn => {
       if (isLoggedIn) {
         Swal.fire({
           title: 'Preparando el pago...',
@@ -78,6 +77,7 @@ export class SuscripcionComponent {
       }
     });
   }
+  
 
   // Funcion para mostrar el formulario de Stripe en SweetAlert2
   mostrarStripeEnSweetAlert() {

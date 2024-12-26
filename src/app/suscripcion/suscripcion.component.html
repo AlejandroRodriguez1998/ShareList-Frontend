@@ -2,46 +2,88 @@
     <div class="container">
       <h2>Planes de Suscripción</h2>
 
-      <table class="table table-bordered text-center">
-        <thead>
-          <tr>
-            <th>Características</th>
-            <th>Versión Gratuita</th>
-            <th>Versión Premium</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Acceso a funcionalidades básicas</td>
-            <td><i class="bi bi-check-lg text-success"></i></td>
-            <td><i class="bi bi-check-lg text-success"></i></td>
-          </tr>
-          <tr>
-            <td>Creación de listas</td>
-            <td>2 máximas</td>
-            <td>Iliminitado</td>
-          </tr>
-          <tr>
-            <td>Productos por lista</td>
-            <td>10 máximos</td>
-            <td>Iliminitado</td>
-          </tr>
-          <tr>
-            <td>Invitaciones por lista</td>
-            <td>1 máxima</td>
-            <td>Iliminitado</td>
-          </tr>
-        </tbody>
-      </table>
+      <p>Con nuestra Versión Premium, tendrás acceso ilimitado a todas las funcionalidades que necesitas para gestionar tus listas de manera eficiente. Desbloquea un mundo de posibilidades con invitaciones ilimitadas, sin restricciones en la cantidad de productos o listas, y disfruta de soporte técnico prioritario. Si buscas una solución completa y sin límites, ¡la Premium es para ti!</p>
 
-      <div class="mt-4 text-center">
-        <p class="text-muted">
-            La suscripción Premium tiene un costo de <strong>3€</strong> anuales. Disfruta de todas las funcionalidades avanzadas sin límites.
-        </p>
+      <div class="d-flex justify-content-center mt-3">
+        <div class="row">
+          <!-- Versión Gratuita -->
+          <div class="col-md-6">
+            <div class="pack-container border p-3 text-center text-white rounded">
+              <div class="header">
+                <p class="title fw-bold text-uppercase">Versión Gratuita</p>
+                <div class="price-container d-flex justify-content-center align-items-center">
+                  <span class="fs-4 fw-bold">0€</span>
+                  <span class="fs-6">/año</span>
+                </div>
+              </div>
+              <div>
+                <ul class="lists list-unstyled">
+                  <li class="list mb-2">
+                    <span class="me-2">✔️</span>
+                    <p class="mb-0">Acceso a funcionalidades básicas</p>
+                  </li>
+                  <li class="list mb-2">
+                    <span class="me-2">✔️</span>
+                    <p class="mb-0">Creación de listas: 2 máximas</p>
+                  </li>
+                  <li class="list mb-2">
+                    <span class="me-2">✔️</span>
+                    <p class="mb-0">Productos por lista: 10 máximos</p>
+                  </li>
+                  <li class="list mb-2">
+                    <span class="me-2">✔️</span>
+                    <p class="mb-0">Invitaciones por lista: 1 máxima</p>
+                  </li>
+                </ul>
+              </div>
+              <div class="button-container mt-3">
+                <button type="button" class="btn btn-light w-100" disabled>Seleccionar</button>
+              </div>
+            </div>
+          </div>
+      
+          <!-- Versión Premium -->
+          <div class="col-md-6">
+            <div class="pack-container border p-3 text-center text-white rounded">
+              <div class="header">
+                <p class="title fw-bold text-uppercase">Versión Premium</p>
+                <div class="price-container d-flex justify-content-center align-items-center">
+                  <span class="fs-4 fw-bold">3€</span>
+                  <span class="fs-6">/año</span>
+                </div>
+              </div>
+              <div>
+                <ul class="lists list-unstyled">
+                  <li class="list mb-2">
+                    <span class="me-2">✔️</span>
+                    <p class="mb-0">Acceso a funcionalidades básicas</p>
+                  </li>
+                  <li class="list mb-2">
+                    <span class="me-2">✔️</span>
+                    <p class="mb-0">Creación de listas: Ilimitado</p>
+                  </li>
+                  <li class="list mb-2">
+                    <span class="me-2">✔️</span>
+                    <p class="mb-0">Productos por lista: Ilimitado</p>
+                  </li>
+                  <li class="list mb-2">
+                    <span class="me-2">✔️</span>
+                    <p class="mb-0">Invitaciones por lista: Ilimitado</p>
+                  </li>
+                </ul>
+              </div>
+              <div class="button-container mt-3">
+                <button type="button" class="btn btn-light w-100" (click)="abrirModalStripe()">Seleccionar</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="text-center">
-        <button class="btn btn-primary" (click)="abrirModalStripe()">Suscribirse a Premium</button>
-      </div>
     </div>
 </section>
+
+
+
+
+

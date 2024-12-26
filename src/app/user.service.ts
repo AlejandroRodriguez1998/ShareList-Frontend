@@ -1,75 +1,59 @@
+import { BehaviorSubject, catchError, Observable, of, tap } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, catchError, mapTo, Observable, of, tap, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
-import { error } from 'console';
-
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
-  private isLoggedInSubject = new BehaviorSubject<boolean | null>(null); // Inicializado como null
-  isLoggedIn$ = this.isLoggedInSubject.asObservable(); // Variable publica para saber si está logueado
+  private isLoggedInSubject = new BehaviorSubject<boolean>(false);
+  private loadingSubject = new BehaviorSubject<boolean>(true); // Estado inicial: cargando
 
-  private apiUrl = 'https://localhost:9000/users' // URL de la API
-  private token: string | null = null; // Token de autenticación
+  isLoggedIn$ = this.isLoggedInSubject.asObservable();
+  loadingCompleted$ = this.loadingSubject.asObservable();
 
-  private sessionCheckedSubject = new BehaviorSubject<boolean>(false);
-  sessionChecked$ = this.sessionCheckedSubject.asObservable();
+  isLoading = true;
+
+  private apiUrl = 'https://localhost:9000/users';
 
   constructor(private http:HttpClient, private cookieService: CookieService) {}
 
-  // Para actualizar el estado de login
-  updateLoginStatus(isLoggedIn: boolean) {
-    console.log('Actualizando estado de login a:', isLoggedIn); 
-    this.isLoggedInSubject.next(isLoggedIn);
+  updateLoadingStatus(status: boolean) {
+    this.loadingSubject.next(status);
   }
 
-  // Obtenemos la cookie desde el servicio de cookies
-  getToken() {
+  // Verificar si existe un token
+  checkToken(): boolean {
     const token = this.cookieService.get('token');
-    console.log('Token obtenido de cookies:', token);
-    return token;
-  };
-  
-  checkCookie(): Observable<any> {
-    const urlFinal = this.apiUrl + '/checkCookie';
-    console.log("[checkCookie] Llamando a checkCookie en:", urlFinal);
-    return this.http.get<string>(urlFinal, { responseType: 'text' as 'json', withCredentials: true })      
-    .pipe(tap(token => { 
-      this.token = token;
-      //this.updateLoginStatus(true);
-      console.log('[checkCookie] Token obtenido en checkCookie:', token);
-    }));
+    return !!token;
   }
-  
-// Método para verificar el estado de la sesión al cargar la aplicación
-checkSession(): Observable<boolean> {
-  console.log(" [checkSession] Iniciando verificación de sesión...");
-  return new Observable<boolean>((observer) => {
-    this.checkCookie().subscribe({
-      next: (response) => {
-        console.log("[checkSession] Respuesta del servidor en checkCookie:", response);
-        this.updateLoginStatus(true);
-        this.sessionCheckedSubject.next(true);
-        observer.next(true);
-        observer.complete();
-      },
-      error: (error) => {
-        console.error("[checkSession] Error al verificar la cookie:", error);
-        this.updateLoginStatus(false);
-        this.sessionCheckedSubject.next(true);
-        observer.next(false);
-        observer.complete();
-      }
-    });
-  });
-}
 
+  // Al completar la validación del token, asegúrate de emitir false
+  validateToken(): Observable<boolean> {
+    if (!this.checkToken()) {
+      this.loadingSubject.next(false);
+      this.isLoggedInSubject.next(false);
+      return of(false);
+    }
 
+    const urlFinal = this.apiUrl + '/checkCookie';
 
+    return this.http.get<boolean>(urlFinal, {responseType: 'text' as 'json', withCredentials: true })
+    .pipe(
+      tap(() => { // Cuando el token es válido
+        this.loadingSubject.next(false); // Finaliza la carga
+        this.isLoggedInSubject.next(true);
+      }),
+      catchError((error) => { // Cuando el token no es válido
+        this.loadingSubject.next(false); // Finaliza la carga incluso con error
+        this.isLoggedInSubject.next(false);
+        return of(false);
+      })
+    );
+  }
+    
   // Para registrar un usuario
   register(email : String, pw1 : String, pw2 : String){
     let info = {email : email, pwd1 : pw1, pwd2 : pw2}
@@ -85,20 +69,19 @@ checkSession(): Observable<boolean> {
 
     let urlFinal = this.apiUrl + '/login1';
     return this.http.put<any>(urlFinal, info,  { responseType: 'text' as 'json', withCredentials : true})
-    .pipe(tap(() => { this.updateLoginStatus(true); }));
+    .pipe(tap(() => { this.isLoggedInSubject.next(true); }));
   }
 
-  // Para desloguear un usuario
-  logout() {
-    let urlFinal = this.apiUrl + '/logout';
-    return this.http.get<any>(urlFinal, { withCredentials: true })
-      .pipe(tap(() => {
+  // Método de logout para eliminar el token
+  logout(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/logout`, { withCredentials: true }).pipe(
+      tap(() => {
         this.cookieService.delete('token');
-        this.updateLoginStatus(false);
-      }));
+        this.isLoggedInSubject.next(false);
+      })
+    );
   }
 
-  
   // Cambiar a usuario premium
   changeToPremium() {
     let urlFinal = this.apiUrl + '/premium';

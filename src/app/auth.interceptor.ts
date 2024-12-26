@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
 import { UserService } from './user.service';
+import { catchError } from 'rxjs/operators';
+import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Injectable()
@@ -15,7 +15,6 @@ export class AuthInterceptor implements HttpInterceptor {
     return next.handle(request).pipe(
       catchError((err: HttpErrorResponse) => {
         if (err.status === 401) {
-          this.userService.updateLoginStatus(false);
           this.router.navigate(['/IniciarSesion']);
         }
         return throwError(() => err);
