@@ -17,6 +17,9 @@ nav {
 
 .nav-link {
     color: white;
+    font-family: "Shantell Sans", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
 }
 
 .nav-link:hover {
@@ -25,6 +28,9 @@ nav {
 }
 
 .buttonIniciar {
+    font-family: "Shantell Sans", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
     color: white;
     width: 125px;
     height: 45px;
@@ -79,6 +85,9 @@ nav {
 
 /* text */
 a .text {
+    font-family: "Shantell Sans", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
     position: absolute;
     right: 0%;
     width: 0%;
@@ -145,7 +154,3 @@ a .text {
       transform: rotate(360deg);
     }
 }
-  
-
-  
-  

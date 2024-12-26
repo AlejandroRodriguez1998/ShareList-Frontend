@@ -1,11 +1,11 @@
 .suscripcion {
-    padding: 30px 0;
-    .table {
-      margin-top: 20px;
-    }
-    .btn-primary {
-      margin-top: 20px;
-    }
+  padding: 30px 0;
+}
+
+h2 {
+  font-family: "Shantell Sans", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
 }
 
 .modal-content {

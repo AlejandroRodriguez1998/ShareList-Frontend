@@ -45,6 +45,7 @@ export class UserService {
       tap(() => { // Cuando el token es válido
         this.loadingSubject.next(false); // Finaliza la carga
         this.isLoggedInSubject.next(true);
+        return of(true);
       }),
       catchError((error) => { // Cuando el token no es válido
         this.loadingSubject.next(false); // Finaliza la carga incluso con error

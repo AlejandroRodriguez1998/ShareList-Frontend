@@ -71,7 +71,7 @@ export class SuscripcionComponent {
         Swal.fire({
           icon: 'warning',
           title: 'Aviso',
-          html: '<p>Debes estar <strong>iniciado sesión</strong> o <strong>registrado</strong> para realizar el pago a usuario premium.</p>' +
+          html: '<p>Debes estar <strong>iniciado sesión</strong> para realizar el pago a usuario premium.</p>' +
             '<p><a href="/IniciarSesion">Iniciar Sesión</a> o <a href="/Registrarse"> Registrarse</p>',
         });
       }

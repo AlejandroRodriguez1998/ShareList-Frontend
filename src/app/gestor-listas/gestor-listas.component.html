@@ -1,80 +1,84 @@
-<div class="px-3 mt-3">
-  <p>Tus listas de la compra</p>
+<section class="gestionListas">
+  <div class="container">
+    <h2 class="mb-3">Tus listas de la compra</h2>
 
-  <input type="text" [(ngModel)]="nombreLista" placeholder="Nombre de la lista">
-  <button class="btn btn-primary" (click)="agregarLista()">Crear lista</button>
+    <div class="input-container">
+      <input [(ngModel)]="nombreLista" placeholder="Nombre de la lista" type="text">
+      <button class="invite-btn" (click)="agregarLista()" type="button">Crear</button>
+    </div>
 
-  <p *ngIf="misListas.length === 0">No tienes listas de la compra</p>
+    <p *ngIf="misListas.length === 0">No tienes listas de la compra</p>
 
-  <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
-    <div class="col" *ngFor="let lista of misListas; let i = index">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5 class="card-title text-center">{{ lista.nombre.charAt(0).toUpperCase() + lista.nombre.slice(1).toLowerCase() }}</h5>
-          <p class="card-text">ID: {{ lista.id }}</p>
+    <div class="row row-cols-1 row-cols-md-3 g-4 mt-1">
+      <div class="col" *ngFor="let lista of misListas; let i = index">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title text-center">{{ lista.nombre.charAt(0).toUpperCase() + lista.nombre.slice(1).toLowerCase() }}</h5>
+            <!-- <p class="card-text">ID: {{ lista.id }}</p> -->
 
-          <p *ngIf="lista.productos.length === 0">No tienes productos</p>
+            <p *ngIf="lista.productos.length === 0">No tienes productos</p>
 
-          <table *ngIf="lista.productos.length !== 0" class="table table-sm">
-            <thead>
-              <tr class="text-center">
-                <th></th>
-                <th>Pedidas</th>
-                <th>Compradas</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Muestra hasta un máximo de 3 productos -->
-              <tr *ngFor="let producto of lista.productos.slice(0, 3); let j = index">
-                <td>{{ producto.nombre }}</td>
-                <td class="text-center">{{ producto.udsPedidas }}</td>
-                <td class="text-center">
-                  <input type="number" [(ngModel)]="producto.udsCompradas" 
-                    (focus)="almacenarValoresOriginales(producto)"
-                    
-                    (change)="actualizarCantidadComprada(producto, i, j)" 
-                    min="0" [max]="producto.udsPedidas" class="form-control form-control-sm" />
-                </td>
-              </tr>
-            </tbody>
-          </table>
+            <table *ngIf="lista.productos.length !== 0" class="table table-sm">
+              <thead>
+                <tr class="text-center">
+                  <th></th>
+                  <th>Pedidas</th>
+                  <th>Compradas</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Muestra hasta un máximo de 3 productos -->
+                <tr *ngFor="let producto of lista.productos.slice(0, 3); let j = index">
+                  <td>{{ producto.nombre }}</td>
+                  <td class="text-center">{{ producto.udsPedidas }}</td>
+                  <td class="text-center">
+                    <input type="number" [(ngModel)]="producto.udsCompradas" 
+                      (focus)="almacenarValoresOriginales(producto)"
+                      
+                      (change)="actualizarCantidadComprada(producto, i, j)" 
+                      min="0" [max]="producto.udsPedidas" class="form-control form-control-sm" />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
 
-          <button *ngIf="lista.productos.length > 3" class="btn btn-link d-block mx-auto p-0" (click)="abrirModalVerMas(i)">Ver más...</button>
-        </div>
-        <div class="card-footer d-flex justify-content-between align-items-center">
-          <!-- Sección izquierda: Usuarios -->
-          <div class="usuarios">
+            <button *ngIf="lista.productos.length > 3" class="btn btn-link d-block mx-auto p-0" (click)="abrirModalVerMas(i)">Ver más...</button>
           </div>
-        
-          <!-- Sección derecha: Botones -->
-          <div class="acciones">   
-            <span class="icono me-3"
-            *ngIf="lista.propietario === propietario" 
-            (click)="generarEnlaceInvitacion(i)" style="cursor: pointer;">
-              <i class="bi bi-share"></i>
-            </span>
+          <div class="card-footer d-flex justify-content-between align-items-center">
+            <!-- Sección izquierda: Usuarios -->
+            <div class="usuarios">
+            </div>
+          
+            <!-- Sección derecha: Botones -->
+            <div class="acciones">   
+              <span class="icono me-3"
+              *ngIf="lista.propietario === propietario" 
+              (click)="generarEnlaceInvitacion(i)" style="cursor: pointer;">
+                <i class="bi bi-share"></i>
+              </span>
 
-            <span class="icono me-3" (click)="abrirModalAgregarProducto(i)" style="cursor: pointer;">
-              <i class="bi bi-plus-circle"></i>
-            </span>
-        
-            <span [ngClass]="{'me-3': lista.propietario === propietario}" 
-            (click)="editarModal(i)" style="cursor: pointer;">
-              <i class="bi bi-pen"></i>
-            </span>
-        
-            <!-- Icono de eliminar -->
-            <span class="icono" 
-            *ngIf="lista.propietario === propietario"
-            (click)="eliminarLista(i)" style="cursor: pointer;">
-              <i class="bi bi-trash"></i>
-            </span>
+              <span class="icono me-3" (click)="abrirModalAgregarProducto(i)" style="cursor: pointer;">
+                <i class="bi bi-plus-circle"></i>
+              </span>
+          
+              <span [ngClass]="{'me-3': lista.propietario === propietario}" 
+              (click)="editarModal(i)" style="cursor: pointer;">
+                <i class="bi bi-pen"></i>
+              </span>
+          
+              <!-- Icono de eliminar -->
+              <span class="icono" 
+              *ngIf="lista.propietario === propietario"
+              (click)="eliminarLista(i)" style="cursor: pointer;">
+                <i class="bi bi-trash"></i>
+              </span>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+</section>
 
 <!-- Modal para agregar productos -->
 <div class="modal fade" id="productoModal" tabindex="-1" aria-labelledby="productoModalLabel" aria-hidden="true">
