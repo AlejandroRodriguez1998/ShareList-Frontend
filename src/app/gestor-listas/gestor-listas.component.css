@@ -66,6 +66,20 @@ h2 {
     background-color: #1a2c3f;
 }
 
+::ng-deep .toast-info {
+    background-color: #1a2c3f !important; /* Cambia al color que prefieras */
+    color: #ffffff !important;
+    box-shadow: 0px 4px 6px rgba(46, 44, 44, 0.2) !important; /* Sombra más sutil */
+}
+
+::ng-deep .toast-success {
+    box-shadow: 0px 4px 6px rgba(46, 44, 44, 0.2) !important; /* Sombra más sutil */
+}
+
+::ng-deep .toast-error {
+    box-shadow: 0px 4px 6px rgba(46, 44, 44, 0.2) !important; /* Sombra más sutil */
+}
+
 .card {
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  

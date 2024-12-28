@@ -1,13 +1,30 @@
 .inicio {
-    padding: 30px 0;
-    h1 {
-      font-size: 3rem;
-    }
+  padding: 30px 0;
 }
 
-.inicio img {
-    max-height: 25rem;  
-    width: 100%;        
-    display: block;   
-    margin: 0 auto;  
+.card-img-top {
+  height: 90px;
+  object-fit: contain;
+}
+
+.hero-image {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.bg-primary, .bg-dark {
+  background-color:  #0B1B32 !important;
+}
+
+.btn-light, .btn-primary {
+  background-color: #26415E !important;
+  border-color: #26415E !important;
+  color: white;
+}
+
+.btn-light:hover, .btn-primary:hover {
+  background-color: #1a2c3f !important;
+  border-color: #1a2c3f !important;
 }

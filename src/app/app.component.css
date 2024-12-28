@@ -15,6 +15,19 @@ nav {
     border: var(--bs-border-width) solid #26415E !important;
 }
 
+.navbar-toggler-icon {
+    background-image: none; /* Eliminar imagen predeterminada */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.navbar-toggler-icon::before {
+    content: '\2630'; /* Unicode para el ícono "hamburguesa" */
+    font-size: 1.5rem; /* Ajusta el tamaño según prefieras */
+    color: #33567c; /* Color del ícono */
+}
+
 .nav-link {
     color: white;
     font-family: "Shantell Sans", serif;

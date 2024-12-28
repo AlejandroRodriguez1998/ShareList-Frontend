@@ -1,8 +1,93 @@
-<section class="inicio">
-    <div class="container text-center">
-      <h1>Bienvenido a Nuestra Aplicación</h1>
-      <img src="banner.png" alt="Banner de bienvenida" class="img-fluid mt-4">
-      <p>Explora nuestras funcionalidades y elige la mejor opción para ti.</p>
-      <a class="btn btn-primary" routerLink="/suscripcion">Ver planes de suscripción</a>
+<main class="inicio">
+  <!-- Hero Image Section -->
+  <section class="mt-4">
+    <img src="banner.png" alt="Hero Image" class="hero-image">
+  </section>
+
+  <!-- Hero Section -->
+  <section class="hero bg-primary text-white text-center py-5">
+      <div class="container">
+          <h1 class="display-4">Gestiona tus listas de compra con facilidad</h1>
+          <p class="lead">Una solución práctica para compartir, organizar y gestionar tus compras.</p>
+          <a routerLink="/Registrarse" class="btn btn-light btn-lg">Regístrate Gratis</a>
+      </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="py-5">
+      <div class="container">
+          <h2 class="text-center mb-4">Características</h2>
+          <div class="row g-4">
+              <div class="col-md-4">
+                  <div class="card shadow h-100 p-2">
+                      <img src="listas.png" class="card-img-top" alt="Característica 1">
+                      <div class="card-body text-center">
+                          <h5 class="card-title">Gestión de Listas</h5>
+                          <p class="card-text">Organiza tus listas de compras y compártelas con quien quieras.</p>
+                      </div>
+                  </div>
+              </div>
+              <div class="col-md-4">
+                  <div class="card shadow h-100 p-2">
+                      <img src="productos.png" class="card-img-top" alt="Característica 2">
+                      <div class="card-body text-center">
+                          <h5 class="card-title">Control de Productos</h5>
+                          <p class="card-text">Añade, edita y sigue el progreso de tus compras fácilmente.</p>
+                      </div>
+                  </div>
+              </div>
+              <div class="col-md-4">
+                  <div class="card shadow h-100 p-2">
+                      <img src="premium.png" class="card-img-top mt-1" alt="Característica 3">
+                      <div class="card-body text-center">
+                          <h5 class="card-title">Versión Premium</h5>
+                          <p class="card-text">Disfruta de listas ilimitadas, soporte prioritario y más.</p>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+
+  <!-- Call to Action -->
+  <section class="cta bg-light py-5">
+      <div class="container text-center">
+          <h2>Descubre cómo ShareList puede simplificar tu vida</h2>
+          <p>Prueba nuestra aplicación hoy mismo.</p>
+          <a routerLink="/Suscripcion" class="btn btn-primary btn-lg">Ver Planes</a>
+      </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section id="testimonials" class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Lo que dicen nuestros usuarios</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card bg-dark text-white shadow h-100">
+                    <div class="card-body text-center">
+                        <p class="card-text">"ShareList ha cambiado la forma en que organizo mis compras. ¡Es increíblemente fácil de usar!"</p>
+                        <h5 class="card-title">Ana Gómez</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-dark text-white shadow h-100">
+                    <div class="card-body text-center">
+                        <p class="card-text">"Me encanta poder compartir mis listas de la compra con mi familia y amigos. ¡Muy práctico!"</p>
+                        <h5 class="card-title">Carlos López</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-dark text-white shadow h-100">
+                    <div class="card-body text-center">
+                        <p class="card-text">"La versión Premium vale cada centavo, es súper barata y práctica. ¡Muy recomendado pagarlo sin duda!"</p>
+                        <h5 class="card-title">María Fernández</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</section>
+  </section>
+</main>

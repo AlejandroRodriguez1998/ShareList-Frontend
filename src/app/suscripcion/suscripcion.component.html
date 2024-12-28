@@ -6,80 +6,80 @@
 
       <div class="d-flex justify-content-center mt-3">
         <div class="row">
-          <!-- Versión Gratuita -->
-          <div class="col-md-6">
-            <div class="pack-container border p-3 text-center text-white rounded">
-              <div class="header">
-                <p class="title fw-bold text-uppercase">Versión Gratuita</p>
-                <div class="price-container d-flex justify-content-center align-items-center">
-                  <span class="fs-4 fw-bold">0€</span>
-                  <span class="fs-6">/año</span>
+            <!-- Versión Gratuita -->
+            <div class="col-12 col-md-6 mb-3">
+                <div class="pack-container border p-3 text-center text-white rounded mx-auto">
+                    <div class="header">
+                        <p class="title fw-bold text-uppercase">Versión Gratuita</p>
+                        <div class="price-container d-flex justify-content-center align-items-center">
+                            <span class="fs-4 fw-bold">0€</span>
+                            <span class="fs-6">/año</span>
+                        </div>
+                    </div>
+                    <div>
+                        <ul class="lists list-unstyled">
+                            <li class="list mb-2">
+                                <span class="me-2">✔️</span>
+                                <p class="mb-0">Acceso a funcionalidades básicas</p>
+                            </li>
+                            <li class="list mb-2">
+                                <span class="me-2">✔️</span>
+                                <p class="mb-0">Creación de listas: 2 máximas</p>
+                            </li>
+                            <li class="list mb-2">
+                                <span class="me-2">✔️</span>
+                                <p class="mb-0">Productos por lista: 10 máximos</p>
+                            </li>
+                            <li class="list mb-2">
+                                <span class="me-2">✔️</span>
+                                <p class="mb-0">Invitaciones por lista: 1 máxima</p>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="button-container mt-3">
+                        <button type="button" class="btn btn-light w-100" disabled>Seleccionar</button>
+                    </div>
                 </div>
-              </div>
-              <div>
-                <ul class="lists list-unstyled">
-                  <li class="list mb-2">
-                    <span class="me-2">✔️</span>
-                    <p class="mb-0">Acceso a funcionalidades básicas</p>
-                  </li>
-                  <li class="list mb-2">
-                    <span class="me-2">✔️</span>
-                    <p class="mb-0">Creación de listas: 2 máximas</p>
-                  </li>
-                  <li class="list mb-2">
-                    <span class="me-2">✔️</span>
-                    <p class="mb-0">Productos por lista: 10 máximos</p>
-                  </li>
-                  <li class="list mb-2">
-                    <span class="me-2">✔️</span>
-                    <p class="mb-0">Invitaciones por lista: 1 máxima</p>
-                  </li>
-                </ul>
-              </div>
-              <div class="button-container mt-3">
-                <button type="button" class="btn btn-light w-100" disabled>Seleccionar</button>
-              </div>
             </div>
-          </div>
-      
-          <!-- Versión Premium -->
-          <div class="col-md-6">
-            <div class="pack-container border p-3 text-center text-white rounded">
-              <div class="header">
-                <p class="title fw-bold text-uppercase">Versión Premium</p>
-                <div class="price-container d-flex justify-content-center align-items-center">
-                  <span class="fs-4 fw-bold">3€</span>
-                  <span class="fs-6">/año</span>
+    
+            <!-- Versión Premium -->
+            <div class="col-12 col-md-6 mb-3">
+                <div class="pack-container border p-3 text-center text-white rounded mx-auto">
+                    <div class="header">
+                        <p class="title fw-bold text-uppercase">Versión Premium</p>
+                        <div class="price-container d-flex justify-content-center align-items-center">
+                            <span class="fs-4 fw-bold">3€</span>
+                            <span class="fs-6">/año</span>
+                        </div>
+                    </div>
+                    <div>
+                        <ul class="lists list-unstyled">
+                            <li class="list mb-2">
+                                <span class="me-2">✔️</span>
+                                <p class="mb-0">Acceso a funcionalidades básicas</p>
+                            </li>
+                            <li class="list mb-2">
+                                <span class="me-2">✔️</span>
+                                <p class="mb-0">Creación de listas: Ilimitado</p>
+                            </li>
+                            <li class="list mb-2">
+                                <span class="me-2">✔️</span>
+                                <p class="mb-0">Productos por lista: Ilimitado</p>
+                            </li>
+                            <li class="list mb-2">
+                                <span class="me-2">✔️</span>
+                                <p class="mb-0">Invitaciones por lista: Ilimitado</p>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="button-container mt-3">
+                        <button type="button" class="btn btn-light w-100" (click)="abrirModalStripe()">Seleccionar</button>
+                    </div>
                 </div>
-              </div>
-              <div>
-                <ul class="lists list-unstyled">
-                  <li class="list mb-2">
-                    <span class="me-2">✔️</span>
-                    <p class="mb-0">Acceso a funcionalidades básicas</p>
-                  </li>
-                  <li class="list mb-2">
-                    <span class="me-2">✔️</span>
-                    <p class="mb-0">Creación de listas: Ilimitado</p>
-                  </li>
-                  <li class="list mb-2">
-                    <span class="me-2">✔️</span>
-                    <p class="mb-0">Productos por lista: Ilimitado</p>
-                  </li>
-                  <li class="list mb-2">
-                    <span class="me-2">✔️</span>
-                    <p class="mb-0">Invitaciones por lista: Ilimitado</p>
-                  </li>
-                </ul>
-              </div>
-              <div class="button-container mt-3">
-                <button type="button" class="btn btn-light w-100" (click)="abrirModalStripe()">Seleccionar</button>
-              </div>
             </div>
-          </div>
         </div>
       </div>
-
+    
     </div>
 </section>
 
