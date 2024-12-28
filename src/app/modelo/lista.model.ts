@@ -5,6 +5,7 @@ export class lista {
     nombre: string;
     propietario: string;
     productos : producto[];
+    invitaciones: any;
     
     constructor(){
         this.id = "";

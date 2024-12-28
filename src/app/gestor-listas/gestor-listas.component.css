@@ -98,3 +98,22 @@ h2 {
 .icono i:hover {
     color: #007bff;     
 }
+
+.circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.circle.more {
+    background-color: gray;
+    color: white;
+    font-size: 1rem;
+}

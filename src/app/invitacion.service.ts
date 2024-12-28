@@ -33,4 +33,9 @@ export class InvitacionService {
     let urlFinal = this.apiUrl + '/aceptarInvitacion';
     return this.http.post<any>(urlFinal, info, { withCredentials: true });
   }
+
+  eliminarInvitacion(id: string): Observable<any> {
+    let urlFinal = this.apiUrl + '/eliminarInvitacion/' + id;
+    return this.http.delete<any>(urlFinal, { withCredentials: true });
+  }
 }

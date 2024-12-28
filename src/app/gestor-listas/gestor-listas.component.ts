@@ -55,7 +55,23 @@ export class GestorListasComponent {
   // Carga las listas desde el servicio
   cargarListas() {
     this.service.obtenerListas().subscribe(
-      (listas) => this.misListas = listas,
+      (listas) => {
+        this.misListas = listas.map(listaData => {
+          const nuevaLista = new lista();
+          nuevaLista.inicializar(listaData.nombre, listaData.id, listaData.propietario);
+          nuevaLista.invitaciones = listaData.invitaciones.map((inv: { emailUsuario: string; }) => ({
+            ...inv,
+            // Obtén la inicial del correo (primer carácter antes de '@')
+            inicial: this.obtenerInicialDesdeEmail(inv.emailUsuario),
+            // Genera un color aleatorio para el círculo
+            color: this.generarColorAleatorio()
+          }));
+          nuevaLista.productos = listaData.productos;
+          return nuevaLista;
+        });
+
+        console.log(this.misListas);
+      },
       (error) => this.toastr.error('Error al cargar las listas', error.message)
     );
   }
@@ -291,6 +307,21 @@ export class GestorListasComponent {
     );
   }
 
+  eliminarInvitacion(idInvitacion: string, listaIndex: number, invitacionIndex: number) {
+    this.confirmarAccion('¿Estás seguro?', '¡No podrás revertir esto!', 'Eliminar', 'Cancelar')
+    .then((result) => {
+      if (result.isConfirmed) {
+        this.invitacionService.eliminarInvitacion(idInvitacion).subscribe(
+          () => {
+            this.misListas[listaIndex].invitaciones.splice(invitacionIndex, 1);
+            Swal.fire('Eliminada', 'La invitación ha sido eliminada.', 'success');
+          },
+          (error) => this.manejarErrorHttp(error, 'Hubo un problema al eliminar la invitación.')
+        )
+      }
+    });
+  }
+
   // Abre el modal para agregar un producto
   abrirModalAgregarProducto(indice: number) {
     this.abrirModal('productoModal', indice);
@@ -411,6 +442,24 @@ export class GestorListasComponent {
         lista.productos = lista.productos.filter(producto => producto.id !== data.idProducto);
         break;
     }
+  }
+
+  // Genera un color aleatorio en formato hexadecimal
+  private generarColorAleatorio(): string {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
+
+  // Obtiene la inicial del correo electrónico
+  private obtenerInicialDesdeEmail(email: string): string {
+    return email ? email.charAt(0).toUpperCase() : '?';
+  }
+
+  oirLista(index: number) {
   }
 }
 
