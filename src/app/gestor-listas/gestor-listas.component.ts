@@ -1,15 +1,15 @@
+import { InvitacionService } from '../invitacion.service';
 import { producto } from '../modelo/producto.model';
 import { ListaService } from '../lista.service';
 import { CommonModule } from '@angular/common';
 import { lista } from '../modelo/lista.model';
 import { FormsModule } from '@angular/forms';
+import { VozService } from '../voz.service';
 import { ToastrService } from 'ngx-toastr'; // Avisos emergentes
 import { Component } from '@angular/core';
 import Swal from 'sweetalert2';
-import { InvitacionService } from '../invitacion.service';
 
 declare var bootstrap: any; // Para usar los modales de Bootstrap
-
 @Component({
   selector: 'app-gestor-listas',
   standalone: true,
@@ -33,13 +33,15 @@ export class GestorListasComponent {
   nuevoProducto : string = '';
   unidadesPedidas : number = 0;
   unidadesCompradas: number = 0;
+  udsCompraTemporal: number = 0;
   
   // Websocket para listas compartidas
   ws : WebSocket = new WebSocket('ws://localhost/wsLista?email=' + localStorage.getItem('email'));
 
   private timeout: any;// Temporizador para gestionar actualizaciones de productos
 
-  constructor(private service: ListaService, private toastr: ToastrService, private invitacionService: InvitacionService) {
+  constructor(private service: ListaService, private toastr: ToastrService, 
+    private invitacionService: InvitacionService, private vozService: VozService) {
     // Maneja errores en la conexión WebSocket
     this.ws.onerror = (event) => console.error('Error en la conexión websocket:', event);
 
@@ -61,16 +63,18 @@ export class GestorListasComponent {
           nuevaLista.inicializar(listaData.nombre, listaData.id, listaData.propietario);
           nuevaLista.invitaciones = listaData.invitaciones.map((inv: { emailUsuario: string; }) => ({
             ...inv,
-            // Obtén la inicial del correo (primer carácter antes de '@')
             inicial: this.obtenerInicialDesdeEmail(inv.emailUsuario),
-            // Genera un color aleatorio para el círculo
             color: this.generarColorAleatorio()
           }));
-          nuevaLista.productos = listaData.productos;
+          nuevaLista.productos = listaData.productos.map(productoData => {
+            const nuevoProducto = new producto();
+            nuevoProducto.crearProducto(productoData.nombre, productoData.udsPedidas, productoData.udsCompradas);
+            nuevoProducto.id = productoData.id;
+            nuevoProducto.udsCompraTemporal = 0; // Inicializamos la cantidad temporal
+            return nuevoProducto;
+          });
           return nuevaLista;
         });
-
-        console.log(this.misListas);
       },
       (error) => this.toastr.error('Error al cargar las listas', error.message)
     );
@@ -187,51 +191,45 @@ export class GestorListasComponent {
     );
   }
 
-  // Valida que la cantidad comprada sea válida
-  private validarCantidad(producto: producto): boolean {
-    if (producto.udsCompradas == null || isNaN(producto.udsCompradas)) {
-      this.toastr.info('La cantidad comprada no puede estar vacía.', 'Advertencia');
-      producto.udsCompradas = this.valoresOriginales[producto.id]?.udsCompradas!;
-      return false;
-    }
-    return true;
-  }
-
-  // Valida que la cantidad comprada no sea igual o mayor a la cantidad pedida
+  // Valida que la cantidad temporal no exceda las unidades pendientes
   private validarAntesDeActualizar(producto: producto): boolean {
-    if (producto.udsCompradas == 0 && producto.udsPedidas == 0) {
-      this.toastr.info('La cantidad comprada no puede ser 0.', 'Advertencia');
-      return false;
-    } else if (producto.udsCompradas > producto.udsPedidas) {
-      this.toastr.info('La cantidad comprada no puede superar las unidades pedidas.', 'Advertencia');
-      return false;
+    if (producto.udsCompraTemporal <= 0) {
+        this.toastr.info('La cantidad a comprar debe ser mayor a 0.', 'Advertencia');
+        return false;
+    } else if (producto.udsCompraTemporal > producto.udsPendientes) {
+        this.toastr.info('La cantidad a comprar no puede superar las unidades pedientes.','Advertencia');
+        return false;
     }
-
     return true;
   }
 
-  // Actualiza la cantidad comprada de un producto
+  // Actualiza la cantidad comprada de un producto utilizando la cantidad temporal
   actualizarCantidadComprada(producto: producto, listaIndex: number, productoIndex: number) {
-    if (!this.validarCantidad(producto)) return;
+    const cantidadTemporal = producto.udsCompraTemporal;
 
-    // Evita múltiples actualizaciones simultáneas
+    // Validar antes de proceder
+    if (!this.validarAntesDeActualizar(producto)) {
+      producto.udsCompraTemporal = 0; // Resetea la cantidad temporal
+      return;
+    } 
+
+    // Evitar múltiples actualizaciones simultáneas
     if (this.timeout) clearTimeout(this.timeout);
 
     // Esperar un tiempo antes de hacer la llamada al servidor
     this.timeout = setTimeout(() => {
-      if (!this.validarAntesDeActualizar(producto)) {
-        producto.udsCompradas = this.valoresOriginales[producto.id]?.udsCompradas!;
-        return;
-      }
+        // Llamada al servicio para actualizar la cantidad comprada en el backend
+        this.service.actualizarProductoComprado(producto.id, producto.udsCompraTemporal).subscribe(
+            () => {
+                // Actualizar cantidades en el producto
+                producto.udsCompradas += cantidadTemporal;
+                producto.udsPendientes -= cantidadTemporal;
+                this.toastr.success(`Se han comprado ${cantidadTemporal} unidades de "${producto.nombre}".`);
+            },
+            (error) => this.manejarErrorHttp(error, 'Error al actualizar la cantidad comprada.')
+        );
 
-      // Llamada al servicio para actualizar la cantidad comprada en el backend
-      this.service.actualizarProductoComprado(producto.id, producto.udsCompradas).subscribe(
-        (response) => {
-          this.toastr.success(`El producto "${producto.nombre}" ha sido comprado correctamente.`);
-          this.misListas[listaIndex].productos[productoIndex] = { ...response };
-        },
-        (error) => this.manejarErrorHttp(error, 'Error al actualizar la cantidad comprada.')
-      );
+        producto.udsCompraTemporal = 0; // Resetea la cantidad temporal
     }, 500); // 500 ms de retraso
   }
 
@@ -270,7 +268,10 @@ export class GestorListasComponent {
         
           this.toastr.success('Producto actualizado correctamente');
         },
-        error => this.manejarErrorHttp(error, 'Error al actualizar el producto')
+        error => {
+          this.manejarErrorHttp(error, 'Error al actualizar el producto');
+          producto.udsPedidas = this.valoresOriginales[producto.id].udsPedidas!;
+        }
       );
     }
   }
@@ -366,7 +367,7 @@ export class GestorListasComponent {
 
   // Maneja errores genéricos
   private manejarErrorHttp(error: any, mensajeDefault: string) {
-    Swal.fire('Error', error.error?.message || mensajeDefault, 'error');
+    this.toastr.error( error.error?.message || mensajeDefault, 'Error');
   }
 
   // Muestra un mensaje de límite alcanzado con sugerencia de actualización
@@ -387,7 +388,6 @@ export class GestorListasComponent {
       html: text,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText,
       cancelButtonText
@@ -459,7 +459,48 @@ export class GestorListasComponent {
     return email ? email.charAt(0).toUpperCase() : '?';
   }
 
+  getInvitacionesExtras(lista: lista): number {
+    return Math.max((lista.invitaciones || []).filter((inv: { usada: any; }) => inv.usada).length - 4, 0);
+  }
+
+  // Leer la lista seleccionada
   oirLista(index: number) {
+    const lista = this.misListas[index];
+    let texto = `Lista: ${lista.nombre}. `;
+    if (lista.productos.length === 0) {
+      texto += 'No hay productos en esta lista.';
+    } else {
+      texto += 'Los productos son: ';
+      lista.productos.forEach(producto => {
+        texto += `${producto.nombre}, con ${producto.udsPedidas} unidades pedidas, ${producto.udsCompradas} unidades compradas y ${producto.udsPendientes} unidades pendientes. `;
+      });
+    }
+
+    // Mostrar el Toast informativo al iniciar la lectura
+    const toastRef = this.toastr.info('Leyendo lista...', 'Información', { timeOut: 0 });
+
+    // Usa el método speak del servicio con una función callback
+    this.vozService.speakWithCallback(texto, () => {
+      if (toastRef.toastId) this.toastr.clear(toastRef.toastId); // Cierra el Toast al finalizar la lectura
+    });
+  }
+
+  // Reconocimiento de voz para campos
+  iniciarReconocimiento(campo: string) {
+    this.vozService.init(campo, (campoReconocido, valor) => {
+      if (campoReconocido === 'nombre') {
+        this.nuevoProducto = valor;
+      } else if (campoReconocido === 'cantidad') {
+        const cantidadReconocida = parseInt(valor, 10);
+        if (!isNaN(cantidadReconocida)) {
+          this.unidadesPedidas = cantidadReconocida;
+        } else {
+          this.toastr.error('Cantidad no reconocida. Intente de nuevo.', 'Error');
+        }
+      }
+    });
+
+    this.vozService.start();
   }
 }
 

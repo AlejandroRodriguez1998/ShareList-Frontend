@@ -121,3 +121,12 @@
   font-size: 14px;
   margin: 5px 0;
 }
+
+::ng-deep .swal2-confirm{
+  background-color: #26415E !important; 
+  color: #ffffff !important;
+}
+
+::ng-deep .swal2-confirm:hover {
+  background-color: #1a2c3f !important;
+}

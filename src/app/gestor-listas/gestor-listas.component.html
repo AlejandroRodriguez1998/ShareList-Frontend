@@ -9,9 +9,9 @@
 
     <p *ngIf="misListas.length === 0">No tienes listas de la compra</p>
 
-    <div class="row row-cols-1 row-cols-md-3 g-4 mt-1">
-      <div class="col" *ngFor="let lista of misListas; let i = index">
-        <div class="card h-100">
+    <div class="row flex-wrap g-3 justify-content-center justify-content-md-start mt-1">
+      <div class="col-auto mt-4" *ngFor="let lista of misListas; let i = index">
+        <div class="card h-100" style="min-width: 400px; max-width: 600px;">
           <div class="card-body">
             <h5 class="card-title text-center">{{ lista.nombre.charAt(0).toUpperCase() + lista.nombre.slice(1).toLowerCase() }}</h5>
             <!-- <p class="card-text">ID: {{ lista.id }}</p> -->
@@ -24,19 +24,21 @@
                   <th></th>
                   <th>Pedidas</th>
                   <th>Compradas</th>
+                  <th>Pendientes</th>
+                  <th>Comprar</th>
                 </tr>
               </thead>
               <tbody>
-                <!-- Muestra hasta un máximo de 3 productos -->
                 <tr *ngFor="let producto of lista.productos.slice(0, 3); let j = index">
                   <td>{{ producto.nombre }}</td>
                   <td class="text-center">{{ producto.udsPedidas }}</td>
+                  <td class="text-center">{{ producto.udsCompradas }}</td>
+                  <td class="text-center">{{ producto.udsPendientes }}</td>
                   <td class="text-center">
-                    <input type="number" [(ngModel)]="producto.udsCompradas" 
-                      (focus)="almacenarValoresOriginales(producto)"
-                      
-                      (change)="actualizarCantidadComprada(producto, i, j)" 
-                      min="0" [max]="producto.udsPedidas" class="form-control form-control-sm" />
+                    <input type="number" min="0" [max]="producto.udsPedidas"
+                      [(ngModel)]="producto.udsCompraTemporal" class="form-control form-control-sm"
+                      placeholder="0" (change)="actualizarCantidadComprada(producto, i, j)"
+                    />
                   </td>
                 </tr>
               </tbody>
@@ -47,19 +49,21 @@
           <div class="card-footer d-flex justify-content-between align-items-center">
             <!-- Sección izquierda: Usuarios -->
             <div class="usuarios">
-              <div *ngIf="lista.propietario === propietario">
+              <div *ngIf="lista.propietario === propietario" class="d-flex align-items-center">
                 <!-- Asegurar que invitaciones existe antes de usar slice -->
-                <div *ngFor="let invitacion of (lista.invitaciones ?? []).slice(0, 4)" 
-                     class="circle me-2" 
+                <ng-container *ngFor="let invitacion of (lista.invitaciones || []); let index = index">
+                  <ng-container *ngIf="invitacion.usada && index < 4">
+                    <div class="circle me-2" 
                      [ngStyle]="{'background-color': invitacion.color}" 
                      [title]="invitacion.emailUsuario" 
                      data-bs-toggle="tooltip">
-                  {{ invitacion.inicial }}
-                </div>
-            
-                <!-- Mostrar un "+" si hay más de 4 invitaciones -->
-                <div *ngIf="(lista.invitaciones?.length ?? 0) > 4" class="circle more">
-                  +{{ (lista.invitaciones?.length ?? 0) - 4 }}
+                      {{ invitacion.inicial }}
+                    </div>
+                  </ng-container>
+                </ng-container>
+                 <!-- Mostrar "+" si hay más de 4 invitaciones aceptadas -->
+                 <div *ngIf="getInvitacionesExtras(lista) > 0" class="circle more">
+                  +{{ getInvitacionesExtras(lista) }}
                 </div>
               </div>
             </div>
@@ -68,28 +72,33 @@
             <div class="acciones">   
               <span class="icono me-2"
               *ngIf="lista.propietario === propietario" 
-              (click)="generarEnlaceInvitacion(i)" style="cursor: pointer;">
+              (click)="generarEnlaceInvitacion(i)" style="cursor: pointer;" 
+              data-bs-toggle="tooltip" title="Generar enlace de invitación">
                 <i class="bi bi-share"></i>
               </span>
 
-              <span class="icono me-2" (click)="abrirModalAgregarProducto(i)" style="cursor: pointer;">
+              <span class="icono me-2" (click)="abrirModalAgregarProducto(i)" style="cursor: pointer;"
+              data-bs-toggle="tooltip" title="Agregar producto">
                 <i class="bi bi-plus-circle"></i>
               </span>
           
               <span class="icono me-2" 
-              (click)="editarModal(i)" style="cursor: pointer;">
+              (click)="editarModal(i)" style="cursor: pointer;"
+              data-bs-toggle="tooltip" title="Editar lista">
                 <i class="bi bi-pen"></i>
               </span>
           
               <!-- Icono de eliminar -->
               <span [ngClass]="{'me-2': lista.propietario === propietario}"  
               *ngIf="lista.propietario === propietario"
-              (click)="eliminarLista(i)" style="cursor: pointer;">
+              (click)="eliminarLista(i)" style="cursor: pointer;"
+              data-bs-toggle="tooltip" title="Eliminar lista">
                 <i class="bi bi-trash"></i>
               </span>
 
               <!-- Icono de ver oir -->
-              <span class="icono" (click)="oirLista(i)" style="cursor: pointer;">
+              <span class="icono" (click)="oirLista(i)" style="cursor: pointer;"
+              data-bs-toggle="tooltip" title="Escuchar lista">
                 <i class="bi bi-ear"></i>
               </span>
             </div>
@@ -111,16 +120,43 @@
       <div class="modal-body">
         <div class="mb-3">
           <label for="producto" class="form-label">Nombre del Producto</label>
-          <input type="text" class="form-control" id="producto" [(ngModel)]="nuevoProducto">
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control"
+              id="producto"
+              [(ngModel)]="nuevoProducto" />
+            <button
+              class="btn btn-outline-secondary"
+              type="button"
+              (click)="iniciarReconocimiento('nombre')"
+              data-bs-toggle="tooltip" title="Hablar">
+              <i class="bi bi-mic"></i>
+            </button>
+          </div>
         </div>
         <div class="mb-3">
           <label for="unidadesPedidas">Cantidad:</label>
-          <input type="number" min="0" max="10" id="unidadesPedidas" [(ngModel)]="unidadesPedidas" />
+          <div class="input-group">
+            <input
+              type="number"
+              min="0"
+              class="form-control w-25"
+              id="unidadesPedidas"
+              [(ngModel)]="unidadesPedidas"
+              placeholder="Di la cantidad" />
+            <button
+              class="btn btn-outline-secondary"
+              type="button"
+              (click)="iniciarReconocimiento('cantidad')"
+              data-bs-toggle="tooltip" title="Hablar">
+              <i class="bi bi-mic"></i>
+            </button>
+          </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        <button type="button" class="btn btn-primary" (click)="agregarProducto()">Guardar Producto</button>
+        <button type="button" class="btn btn-primary" (click)="agregarProducto()">Añadir Producto</button>
       </div>
     </div>
   </div>
@@ -135,23 +171,33 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
+        <label class="toggleSwitch" for="checkboxInput" (click)="oirLista(indiceListaSeleccionada)"
+        data-bs-toggle="tooltip" title="Escuchar lista">
+          <i class="bi bi-ear"></i>
+        </label>
+
         <table class="table table-sm">
           <thead>
             <tr class="text-center">
               <th></th>
               <th>Pedidas</th>
               <th>Compradas</th>
+              <th>Pendientes</th>
+              <th>Comprar</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let producto of listaSeleccionada?.productos; let j = index">
               <td>{{ producto.nombre }}</td>
               <td class="text-center">{{ producto.udsPedidas }}</td>
+              <td class="text-center">{{ producto.udsCompradas }}</td>
+              <td class="text-center">{{ producto.udsPendientes }}</td>
               <td class="text-center">
-                <input type="number" [(ngModel)]="producto.udsCompradas" 
-                  (focus)="almacenarValoresOriginales(producto)"
+                <input type="number" min="0" [max]="producto.udsPedidas"
+                  [(ngModel)]="producto.udsCompraTemporal" class="form-control form-control-sm"
                   (change)="actualizarCantidadComprada(producto, indiceListaSeleccionada, j)" 
-                  min="0" [max]="producto.udsPedidas" class="form-control form-control-sm" />
+                  placeholder="0"
+                />
               </td>
             </tr>
           </tbody>
@@ -240,7 +286,7 @@
                     <span
                       class="icono"
                       (click)="eliminarProducto(producto.id, indiceListaSeleccionada, j)"
-                      style="cursor: pointer;">
+                      style="cursor: pointer;" data-bs-toggle="tooltip" title="Eliminar producto">
                       <i class="bi bi-trash"></i>
                     </span>
                   </td>
@@ -265,12 +311,12 @@
               </thead>
               <tbody>
                 <tr *ngFor="let invitacion of listaSeleccionada?.invitaciones; let j = index">
-                  <td>{{ invitacion.emailUsuario }}</td>
-                  <td class="text-center align-middle">
+                  <td *ngIf="invitacion.usada">{{ invitacion.emailUsuario }}</td>
+                  <td *ngIf="invitacion.usada" class="text-center align-middle">
                     <span
                       class="icono"
                       (click)="eliminarInvitacion(invitacion.id, indiceListaSeleccionada, j)"
-                      style="cursor: pointer;">
+                      style="cursor: pointer;" data-bs-toggle="tooltip" title="Eliminar invitación">
                       <i class="bi bi-trash"></i>
                     </span>
                   </td>

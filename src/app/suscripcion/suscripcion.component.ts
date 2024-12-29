@@ -89,6 +89,7 @@ export class SuscripcionComponent {
       showCancelButton: true,
       confirmButtonText: 'Pagar',
       cancelButtonText: 'Cancelar',
+      cancelButtonColor: '#f44336',
       allowOutsideClick: false, // Evita el cierre al hacer clic fuera del modal
       allowEscapeKey: false,  // Evita el cierre al presionar la tecla Esc
       didOpen: () => {
