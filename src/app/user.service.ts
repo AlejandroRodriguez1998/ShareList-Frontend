@@ -119,6 +119,12 @@ export class UserService {
     const url = `${this.apiUrl}/check-reset-token?token=${encodeURIComponent(token)}`;
     return this.http.get(url, { withCredentials: true, responseType: 'text' });
   }
+
+  activateAccount(token: string): Observable<any> {
+    const url = `${this.apiUrl}/activate?token=${encodeURIComponent(token)}`;
+    return this.http.get(url, { responseType: 'text', withCredentials: false });
+  }
+  
 }
 
 
