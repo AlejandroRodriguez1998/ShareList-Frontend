@@ -89,12 +89,7 @@ export class UserService {
     return this.http.get<any>(urlFinal, { withCredentials: true });
   }
 
-  /**
- * Envía el correo al backend para que se genere el token de reseteo y
- * se mande el email con el enlace de restablecimiento.
- *
- * Llama a POST /users/forgot-password?email=...
- */
+  // Método que envía un correo para restablecer la contraseña
   forgotPassword(email: string): Observable<any> {
     const url = `${this.apiUrl}/forgot-password?email=${encodeURIComponent(email)}`;
     return this.http.post(url, null, { withCredentials: true, responseType: 'text' })
@@ -107,11 +102,7 @@ export class UserService {
       );
   }
 
-  /**
-   * Envía el token y la nueva contraseña para efectuar el cambio.
-   *
-   * Llama a POST /users/reset-password?token=...&newPassword=...
-   */
+ // Método para restablecer la contraseña
   resetPassword(token: string, newPassword: string): Observable<any> {
     const url = `${this.apiUrl}/reset-password?token=${encodeURIComponent(token)}&newPassword=${encodeURIComponent(newPassword)}`;
     return this.http.post(url, null, { withCredentials: true, responseType: 'text' })
@@ -122,6 +113,11 @@ export class UserService {
           throw error; // o return throwError(error)
         })
       );
+  }
+
+  checkResetToken(token: string): Observable<any> {
+    const url = `${this.apiUrl}/check-reset-token?token=${encodeURIComponent(token)}`;
+    return this.http.get(url, { withCredentials: true, responseType: 'text' });
   }
 }
 

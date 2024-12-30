@@ -5,6 +5,8 @@ import { CommonModule } from '@angular/common';
 import { UserService } from '../user.service';
 import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2';
+import { createPasswordStrengthValidator } from '../login1/login1.component'; 
+
 
 @Component({
   selector: 'app-reset-password',
@@ -26,21 +28,59 @@ export class ResetPasswordComponent implements OnInit {
     private toastr: ToastrService,
     private router: Router
   ){
+    // Usamos el mismo validador de fortaleza de contraseña que en login/registro:
     this.resetForm = this.fb.group({
-      newPassword: ['', [Validators.required, Validators.minLength(8)]],
+      newPassword: [
+        '', 
+        [
+          Validators.required, 
+          Validators.minLength(8),
+          createPasswordStrengthValidator() 
+        ]
+      ],
       confirmPassword: ['', Validators.required]
     }, {
       validators: this.passwordsMatchValidator
     });
   }
-
   ngOnInit(): void {
     // Capturamos el token del query param
     this.token = this.route.snapshot.queryParamMap.get('token');
     if (!this.token) {
       this.toastr.error('Token no válido o ausente.', 'Error');
       this.router.navigate(['/']);
+      return;
     }
+
+    // Llamamos al nuevo endpoint /users/check-reset-token para comprobar si sigue válido
+    this.userService.checkResetToken(this.token).subscribe({
+      error: () => {
+        // Si el token está caducado o no es válido mostramos SweetAlert con cuenta atrás
+        let tiempo = 3; // 3 segundos
+        Swal.fire({
+          icon: 'error',
+          title: 'Token inválido o usado',
+          html: `Este enlace ya ha sido usado o está caducado.<br>Serás redirigido en <b>${tiempo}</b> segundos...`,
+          showConfirmButton: false,
+          allowOutsideClick: false,
+          allowEscapeKey: false
+        });
+
+        // Iniciamos la cuenta atrás
+        const interval = setInterval(() => {
+          tiempo--;
+          if (tiempo <= 0) {
+            clearInterval(interval);
+            Swal.close();
+            this.router.navigate(['/IniciarSesion']);
+          } else {
+            Swal.update({
+              html: `Este enlace ya ha sido usado o está caducado.<br>Serás redirigido en <b>${tiempo}</b> segundos...`
+            });
+          }
+        }, 1000);
+      }
+    });
   }
 
   // Validador que comprueba que ambos campos coincidan
@@ -77,8 +117,6 @@ export class ResetPasswordComponent implements OnInit {
       error: (error) => {
         let mensajeError = 'Error al restablecer la contraseña.';
         
-
-      
         // Muestra el Toastr con ese mensaje de error
         this.toastr.error(mensajeError, 'Error');
         
