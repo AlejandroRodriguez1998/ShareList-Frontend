@@ -112,7 +112,6 @@ docs/*.log
 
 # Archivos de despliegue
 /deploy
-/public
 
 # Archivos específicos de frameworks o librerías
 
