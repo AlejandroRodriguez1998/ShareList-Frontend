@@ -6,6 +6,8 @@ import { ToastrService } from 'ngx-toastr'; // Avisos emergentes
 import { Component } from '@angular/core';
 import Swal from 'sweetalert2';
 
+declare var bootstrap: any; // Para usar los modales de Bootstrap
+
 @Component({
   selector: 'app-login1',
   standalone: true,
@@ -17,22 +19,45 @@ import Swal from 'sweetalert2';
 })
 export class Login1Component {
 
-  serverErrorMessage: string | null = null; // Mensaje de error del servidor
+  serverErrorMessage: string | null = null; // Mensaje de error del servidor para login
   loginForm: FormGroup; // Formulario de inicio de sesión
   submitted = false; // Indica si se ha enviado el formulario
+
+  // Formulario de olvido de contraseña
+  forgotPasswordForm: FormGroup;
+  serverErrorMessageForgot: string | null = null;  // Error para forgot-password
   
   constructor(private formBuilder: FormBuilder, 
     private service: UserService, 
     private toastr: ToastrService, 
     private router: Router) 
   {
+    // Form login
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       pwd: ['', [Validators.required, Validators.minLength(8), createPasswordStrengthValidator()]]
     });
+
+    // Form olvido de contraseña
+    this.forgotPasswordForm = this.formBuilder.group({
+      email: ['', [Validators.required, Validators.email]]
+    });
   }
 
-  // Método para enviar el formulario
+    // Abrir modal "¿Olvidaste tu contraseña?"
+    openForgotPasswordModal() {
+      const modalElement = document.getElementById('forgotPasswordModal');
+      if (modalElement) {
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+      }
+    }
+
+
+
+  
+
+  // Método para enviar el formulario de login
   onSubmit() {
     this.submitted = true;
     this.serverErrorMessage = null;
@@ -70,11 +95,43 @@ export class Login1Component {
     }
   }
 
-  // Método para reiniciar el formulario
+    // Lógica de "olvidé mi contraseña"
+    onSubmitForgotPassword() {
+      this.serverErrorMessageForgot = null;
+      
+      if (this.forgotPasswordForm.invalid) {
+        this.toastr.warning('Formulario inválido. Revisa el correo.', 'Advertencia');
+        return;
+      }
+  
+      const email = this.forgotPasswordForm.controls['email'].value;
+  
+      this.service.forgotPassword(email).subscribe({
+        next: () => {
+          this.toastr.success('Te hemos enviado un correo para restablecer la contraseña.', 'Correo enviado');
+          // Cerrar modal
+          const modalElement = document.getElementById('forgotPasswordModal');
+          if (modalElement) {
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            modal?.hide();
+          }
+        },
+        error: (error) => {
+          let mensajeError = 'Error al restablecer la contraseña.';
+          
+          // Muestra el Toastr con ese mensaje de error
+          this.toastr.error(mensajeError, 'Error');
+
+        }
+      });
+    }
+
+  // Método para reiniciar el formulario de login
   onReset() {
     this.loginForm.reset();
     this.serverErrorMessage = null;
   }
+
 
 }
 
@@ -94,4 +151,6 @@ export function createPasswordStrengthValidator(): ValidatorFn {
     
     return !passwordValid ? {passwordStrength:true}: null;
   }
+
+  
 }

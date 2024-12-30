@@ -18,7 +18,7 @@ export class UserService {
 
   private apiUrl = 'https://localhost:9000/users';
 
-  constructor(private http:HttpClient, private cookieService: CookieService) {}
+  constructor(private http: HttpClient, private cookieService: CookieService) { }
 
   updateLoadingStatus(status: boolean) {
     this.loadingSubject.next(status);
@@ -40,28 +40,28 @@ export class UserService {
 
     const urlFinal = this.apiUrl + '/checkCookie';
 
-    return this.http.get<boolean>(urlFinal, {responseType: 'text' as 'json', withCredentials: true })
-    .pipe(
-      tap(() => { // Cuando el token es válido
-        this.loadingSubject.next(false); // Finaliza la carga
-        this.isLoggedInSubject.next(true);
-        return of(true);
-      }),
-      catchError((error) => { // Cuando el token no es válido
-        this.loadingSubject.next(false); // Finaliza la carga incluso con error
-        this.isLoggedInSubject.next(false);
-        return of(false);
-      })
-    );
+    return this.http.get<boolean>(urlFinal, { responseType: 'text' as 'json', withCredentials: true })
+      .pipe(
+        tap(() => { // Cuando el token es válido
+          this.loadingSubject.next(false); // Finaliza la carga
+          this.isLoggedInSubject.next(true);
+          return of(true);
+        }),
+        catchError((error) => { // Cuando el token no es válido
+          this.loadingSubject.next(false); // Finaliza la carga incluso con error
+          this.isLoggedInSubject.next(false);
+          return of(false);
+        })
+      );
   }
-    
+
   // Para registrar un usuario
-  register(email : String, pw1 : String, pw2 : String){
-    let info = {email : email, pwd1 : pw1, pwd2 : pw2}
+  register(email: String, pw1: String, pw2: String) {
+    let info = { email: email, pwd1: pw1, pwd2: pw2 }
 
     let urlFinal = this.apiUrl + '/registrar1'
     // Tenemos que poner withCredentials a false porque si no, da un error de CORS
-    return this.http.post<any>(urlFinal,info, { withCredentials: false })
+    return this.http.post<any>(urlFinal, info, { withCredentials: false })
   }
 
   // Inicio de sesión
@@ -69,8 +69,8 @@ export class UserService {
     let info = { email: email, pwd: pw };
 
     let urlFinal = this.apiUrl + '/login1';
-    return this.http.put<any>(urlFinal, info,  { responseType: 'text' as 'json', withCredentials : true})
-    .pipe(tap(() => { this.isLoggedInSubject.next(true); }));
+    return this.http.put<any>(urlFinal, info, { responseType: 'text' as 'json', withCredentials: true })
+      .pipe(tap(() => { this.isLoggedInSubject.next(true); }));
   }
 
   // Método de logout para eliminar el token
@@ -89,4 +89,41 @@ export class UserService {
     return this.http.get<any>(urlFinal, { withCredentials: true });
   }
 
+  /**
+ * Envía el correo al backend para que se genere el token de reseteo y
+ * se mande el email con el enlace de restablecimiento.
+ *
+ * Llama a POST /users/forgot-password?email=...
+ */
+  forgotPassword(email: string): Observable<any> {
+    const url = `${this.apiUrl}/forgot-password?email=${encodeURIComponent(email)}`;
+    return this.http.post(url, null, { withCredentials: true, responseType: 'text' })
+      .pipe(
+        tap(() => console.log('[forgotPassword] Correo enviado al backend')),
+        catchError((error) => {
+          console.error('[forgotPassword] Error:', error);
+          throw error; // o return throwError(error)
+        })
+      );
+  }
+
+  /**
+   * Envía el token y la nueva contraseña para efectuar el cambio.
+   *
+   * Llama a POST /users/reset-password?token=...&newPassword=...
+   */
+  resetPassword(token: string, newPassword: string): Observable<any> {
+    const url = `${this.apiUrl}/reset-password?token=${encodeURIComponent(token)}&newPassword=${encodeURIComponent(newPassword)}`;
+    return this.http.post(url, null, { withCredentials: true, responseType: 'text' })
+      .pipe(
+        tap(() => console.log('[resetPassword] Contraseña actualizada')),
+        catchError((error) => {
+          console.error('[resetPassword] Error:', error);
+          throw error; // o return throwError(error)
+        })
+      );
+  }
 }
+
+
+

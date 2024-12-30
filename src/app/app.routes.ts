@@ -9,6 +9,7 @@ import { Login1Component } from './login1/login1.component';
 import { map, switchMap, take } from 'rxjs/operators';
 import { UserService } from './user.service';
 import { inject } from '@angular/core';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
 // AuthGuard que permite o deniega el acceso basado en el estado de autenticación y la ruta
 const authGuard: CanActivateFn = (route) => {
@@ -69,5 +70,7 @@ export const routes: Routes = [
   { path: 'GestionarListas', component: GestorListasComponent, canActivate: [authGuard] },
   { path: 'Invitacion', component: InvitacionComponent, canActivate: [authGuard] },
   { path: 'SobreNosotros', component: SobreNosotrosComponent },
+  { path: 'reset-password', component: ResetPasswordComponent },
+
   { path: '**', redirectTo: '', pathMatch: 'full' },
 ];
