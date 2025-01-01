@@ -167,13 +167,14 @@ export class GestorListasComponent {
   private guardarProducto(nuevoProducto: producto, modal: any) {
     this.service.nuevoProducto(this.listaSeleccionada!.id, nuevoProducto).subscribe(
       (response: lista) => {
+        console.log(response);
         // Actualiza la lista seleccionada en misListas con la respuesta del backend
         const index = this.misListas.findIndex(lista => lista.id === this.listaSeleccionada!.id);
         if (index !== -1) this.misListas[index] = response; // Actualiza la lista completa
         
         // Ocultar el modal
-        modal.hide();
         this.limpiarCamposModal();
+        modal.hide();
 
         this.toastr.success(`El producto "${nuevoProducto.nombre}" ha sido agregado a la lista`);
       },
@@ -418,6 +419,8 @@ export class GestorListasComponent {
     const data = JSON.parse(event.data);
     const index = this.misListas.findIndex(lista => lista.id === data.idLista);
     if (index === -1) return;
+
+    console.log(data);
 
     const lista = this.misListas[index];
     switch (data.tipo) {

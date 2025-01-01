@@ -95,12 +95,16 @@ h2 {
     background-color: #1a2c3f !important;
 }
 
-::ng-deep .nav-link {
+::ng-deep #editarProductosModal .nav-link {
     color: #26415E !important;
 }
 
-::ng-deep .nav-link.active {
+::ng-deep #editarProductosModal .nav-link.active {
     color: black !important;
+}
+
+::ng-deep .form-control:focus {
+    box-shadow: none !important;
 }
 
 .btn-outline-secondary{
@@ -189,5 +193,80 @@ h2 {
 }
 
 .toggleSwitch i {
+    color: white;
+}
+
+.coolinput {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 100%;
+  }
+  
+.coolinput label.text {
+    background-color: white; /* Color de fondo para el texto */
+    font-size: 0.9rem;
+    color: #26415E;
+    font-weight: 700;
+    margin-bottom: -1.5px;
+    padding: 0 1px;
+    margin: 0 10px;
+    z-index: 10;
+    width: fit-content;
+    position: relative;
+    top: 11px;
+}
+  
+.input-group {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+  
+.coolinput input[type=text].input {
+    flex: 1;
+    padding: 10px;
+    border: 1px #26415E solid;
+    border-right: none;
+    border-radius: 5px 0 0 5px;
+    background: white;
+}
+  
+.coolinput input[type=text].input:focus {
+    outline: none;
+}
+
+.coolinput input[type=number].input {
+    flex: 1;
+    padding: 10px;
+    border: 1px #26415E solid;
+    border-right: none;
+    border-radius: 5px 0 0 5px;
+    background: white;
+}
+  
+.coolinput input[type=number].input:focus {
+    outline: none;
+}
+  
+.mic-btn {
+    background: white;
+    border: 1px #26415E solid;
+    border-left: none;
+    border-radius: 0 5px 5px 0;
+    padding: 10px;
+    cursor: pointer;
+}
+  
+.mic-btn:hover {
+    background: #1a2c3f;
+}
+  
+.mic-btn i {
+    font-size: 1rem;
+    color: #26415E;
+}
+
+.mic-btn:hover i {
     color: white;
 }

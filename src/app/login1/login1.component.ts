@@ -44,19 +44,6 @@ export class Login1Component {
     });
   }
 
-    // Abrir modal "¿Olvidaste tu contraseña?"
-    openForgotPasswordModal() {
-      const modalElement = document.getElementById('forgotPasswordModal');
-      if (modalElement) {
-        const modal = new bootstrap.Modal(modalElement);
-        modal.show();
-      }
-    }
-
-
-
-  
-
   // Método para enviar el formulario de login
   onSubmit() {
     this.submitted = true;
@@ -95,43 +82,49 @@ export class Login1Component {
     }
   }
 
-    // Lógica de "olvidé mi contraseña"
-    onSubmitForgotPassword() {
-      this.serverErrorMessageForgot = null;
-      
-      if (this.forgotPasswordForm.invalid) {
-        this.toastr.warning('Formulario inválido. Revisa el correo.', 'Advertencia');
-        return;
-      }
-  
-      const email = this.forgotPasswordForm.controls['email'].value;
-  
-      this.service.forgotPassword(email).subscribe({
-        next: () => {
-          this.toastr.success('Te hemos enviado un correo para restablecer la contraseña.', 'Correo enviado');
-          // Cerrar modal
-          const modalElement = document.getElementById('forgotPasswordModal');
-          if (modalElement) {
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            modal?.hide();
-          }
-        },
-        error: (error) => {
-          let mensajeError = 'Error al restablecer la contraseña.';
-          
-          // Muestra el Toastr con ese mensaje de error
-          this.toastr.error(mensajeError, 'Error');
-
-        }
-      });
+  // Abrir modal "¿Olvidaste tu contraseña?"
+  openForgotPasswordModal() {
+    const modalElement = document.getElementById('forgotPasswordModal');
+    if (modalElement) {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
     }
+  }
+
+  // Lógica de "olvidé mi contraseña"
+  onSubmitForgotPassword() {
+    this.serverErrorMessageForgot = null;
+    
+    if (this.forgotPasswordForm.invalid) {
+      this.toastr.warning('Formulario inválido. Revisa el correo.', 'Advertencia');
+      return;
+    }
+
+    const email = this.forgotPasswordForm.controls['email'].value;
+
+    this.service.forgotPassword(email).subscribe({
+      next: () => {
+        this.toastr.success('Te hemos enviado un correo para restablecer la contraseña.', 'Correo enviado');
+        // Cerrar modal
+        const modalElement = document.getElementById('forgotPasswordModal');
+        if (modalElement) {
+          const modal = bootstrap.Modal.getInstance(modalElement);
+          modal?.hide();
+        }
+      },
+      error: (error) => { 
+        // Muestra el Toastr con ese mensaje de error
+        this.toastr.error('Error al restablecer la contraseña.', 'Error');
+
+      }
+    });
+  }
 
   // Método para reiniciar el formulario de login
   onReset() {
     this.loginForm.reset();
     this.serverErrorMessage = null;
   }
-
 
 }
 

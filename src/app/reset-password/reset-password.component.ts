@@ -56,7 +56,7 @@ export class ResetPasswordComponent implements OnInit {
     this.userService.checkResetToken(this.token).subscribe({
       error: () => {
         // Si el token está caducado o no es válido mostramos SweetAlert con cuenta atrás
-        let tiempo = 3; // 3 segundos
+        let tiempo = 10; // 3 segundos
         Swal.fire({
           icon: 'error',
           title: 'Token inválido o usado',

@@ -119,39 +119,45 @@
       </div>
       <div class="modal-body">
         <div class="mb-3">
-          <label for="producto" class="form-label">Nombre del Producto</label>
-          <div class="input-group">
-            <input
-              type="text"
-              class="form-control"
-              id="producto"
-              [(ngModel)]="nuevoProducto" />
-            <button
-              class="btn btn-outline-secondary"
-              type="button"
-              (click)="iniciarReconocimiento('nombre')"
-              data-bs-toggle="tooltip" title="Hablar">
-              <i class="bi bi-mic"></i>
-            </button>
+          <div class="coolinput">
+            <label for="producto" class="text">Producto:</label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control input"
+                id="producto"
+                [(ngModel)]="nuevoProducto"
+                placeholder="Escribe el nombre..." />
+              <button
+                class="btn mic-btn"
+                type="button"
+                (click)="iniciarReconocimiento('nombre')"
+                data-bs-toggle="tooltip" 
+                title="Hablar">
+                <i class="bi bi-mic"></i>
+              </button>
+            </div>
           </div>
         </div>
         <div class="mb-3">
-          <label for="unidadesPedidas">Cantidad:</label>
-          <div class="input-group">
-            <input
-              type="number"
-              min="0"
-              class="form-control w-25"
-              id="unidadesPedidas"
-              [(ngModel)]="unidadesPedidas"
-              placeholder="Di la cantidad" />
-            <button
-              class="btn btn-outline-secondary"
-              type="button"
-              (click)="iniciarReconocimiento('cantidad')"
-              data-bs-toggle="tooltip" title="Hablar">
-              <i class="bi bi-mic"></i>
-            </button>
+          <div class="coolinput">
+            <label for="producto" class="text">Cantidad:</label>
+            <div class="input-group">
+              <input
+                type="number"
+                min="0"
+                class="form-control input"
+                id="unidadesPedidas"
+                [(ngModel)]="unidadesPedidas"
+                placeholder="Di la cantidad" />
+              <button
+                class="btn mic-btn"
+                type="button"
+                (click)="iniciarReconocimiento('cantidad')"
+                data-bs-toggle="tooltip" title="Hablar">
+                <i class="bi bi-mic"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
