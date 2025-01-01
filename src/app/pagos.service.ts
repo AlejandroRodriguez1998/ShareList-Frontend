@@ -1,16 +1,18 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PagosService {
 
-  private apiUrl = 'http://localhost:9000/pagos'
+  private apiUrl = 'https://localhost:9000/pagos' // URL de la API
 
   constructor(private http:HttpClient) { }
 
-  prepararTransaccion(amount: number){
-    return this.http.put(this.apiUrl + '/prepararTransaccion', amount, { responseType: 'text' });
+  // Para obtener el token
+  prepararTransaccion(amount: number){  
+    let urlFinal = this.apiUrl + '/prepararTransaccion';
+    return this.http.put(urlFinal, amount, { responseType: 'text' });
   }
 }

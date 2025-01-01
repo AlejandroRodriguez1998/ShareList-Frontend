@@ -1,7 +1,15 @@
 .sobre-nosotros {
-    padding: 50px 0;
-    background-color: #ffffff;
-    h2 {
-      color: #007bff;
-    }
+  padding: 30px 0;
+}
+
+.creator-img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+}
+
+h1 {
+  font-family: "Shantell Sans", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
 }

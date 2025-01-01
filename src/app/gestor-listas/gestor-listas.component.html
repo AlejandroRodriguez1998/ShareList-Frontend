@@ -1,68 +1,117 @@
-<div class="px-3 mt-3">
-  <p>Tus listas de la compra</p>
+<section class="gestionListas">
+  <div class="container">
+    <h2 class="mb-3">Tus listas de la compra</h2>
 
-  <input type="text" [(ngModel)]="nuevaLista" placeholder="Nombre de la lista">
-  <button class="btn btn-primary" (click)="agregarLista()">Crear lista</button>
+    <div class="input-container">
+      <input [(ngModel)]="nombreLista" placeholder="Nombre de la lista" type="text">
+      <button class="invite-btn" (click)="agregarLista()" type="button">Crear</button>
+    </div>
 
-  <p *ngIf="misListas.length === 0">No tienes listas de la compra</p>
+    <p *ngIf="misListas.length === 0">No tienes listas de la compra</p>
 
-  <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
-    <div class="col" *ngFor="let lista of misListas; let i = index">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5 class="card-title text-center">{{ lista.nombre.charAt(0).toUpperCase() + lista.nombre.slice(1).toLowerCase() }}</h5>
-          <p class="card-text">ID: {{ lista.id }}</p>
+    <div class="row flex-wrap g-3 justify-content-center justify-content-md-start mt-1">
+      <div class="col-auto mt-4" *ngFor="let lista of misListas; let i = index">
+        <div class="card h-100" style="min-width: 400px; max-width: 600px;">
+          <div class="card-body">
+            <h5 class="card-title text-center">{{ lista.nombre.charAt(0).toUpperCase() + lista.nombre.slice(1).toLowerCase() }}</h5>
+            <!-- <p class="card-text">ID: {{ lista.id }}</p> -->
 
-          <p *ngIf="lista.productos.length === 0">No tienes productos</p>
+            <p *ngIf="lista.productos.length === 0">No tienes productos</p>
 
-          <table *ngIf="lista.productos.length !== 0" class="table table-sm">
-            <thead>
-              <tr class="text-center">
-                <th></th>
-                <th>Pedidas</th>
-                <th>Compradas</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Muestra hasta un máximo de 3 productos -->
-              <tr *ngFor="let producto of lista.productos.slice(0, 3)">
-                <td>{{ producto.nombre }}</td>
-                <td class="text-center">{{ producto.udsPedidas }}</td>
-                <td class="text-center">{{ producto.udsCompradas }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="card-footer d-flex justify-content-between align-items-center">
-          <!-- Sección izquierda: Usuarios -->
-          <div class="usuarios">
+            <table *ngIf="lista.productos.length !== 0" class="table table-sm">
+              <thead>
+                <tr class="text-center">
+                  <th></th>
+                  <th>Pedidas</th>
+                  <th>Compradas</th>
+                  <th>Pendientes</th>
+                  <th>Comprar</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let producto of lista.productos.slice(0, 3); let j = index">
+                  <td>{{ producto.nombre }}</td>
+                  <td class="text-center">{{ producto.udsPedidas }}</td>
+                  <td class="text-center">{{ producto.udsCompradas }}</td>
+                  <td class="text-center">{{ producto.udsPendientes }}</td>
+                  <td class="text-center">
+                    <input type="number" min="0" [max]="producto.udsPedidas"
+                      [(ngModel)]="producto.udsCompraTemporal" class="form-control form-control-sm"
+                      placeholder="0" (change)="actualizarCantidadComprada(producto, i, j)"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <button *ngIf="lista.productos.length > 3" class="btn btn-link d-block mx-auto p-0" (click)="abrirModalVerMas(i)">Ver más...</button>
           </div>
-        
-          <!-- Sección derecha: Botones -->
-          <div class="acciones">
-            <span class="icono me-3" (click)="abrirModal(i)" style="cursor: pointer;">
-              <i class="bi bi-plus-circle"></i>
-            </span>
-        
-            <!-- Icono de carrito de compras -->
-            <span class="icono me-3" style="cursor: pointer;">
-              <i class="bi bi-cart"></i>
-            </span>
-        
-            <!-- Icono de eliminar -->
-            <span class="icono" (click)="eliminarLista(i)" style="cursor: pointer;">
-              <i class="bi bi-trash"></i>
-            </span>
+          <div class="card-footer d-flex justify-content-between align-items-center">
+            <!-- Sección izquierda: Usuarios -->
+            <div class="usuarios">
+              <div *ngIf="lista.propietario === propietario" class="d-flex align-items-center">
+                <!-- Asegurar que invitaciones existe antes de usar slice -->
+                <ng-container *ngFor="let invitacion of (lista.invitaciones || []); let index = index">
+                  <ng-container *ngIf="invitacion.usada && index < 4">
+                    <div class="circle me-2" 
+                     [ngStyle]="{'background-color': invitacion.color}" 
+                     [title]="invitacion.emailUsuario" 
+                     data-bs-toggle="tooltip">
+                      {{ invitacion.inicial }}
+                    </div>
+                  </ng-container>
+                </ng-container>
+                 <!-- Mostrar "+" si hay más de 4 invitaciones aceptadas -->
+                 <div *ngIf="getInvitacionesExtras(lista) > 0" class="circle more">
+                  +{{ getInvitacionesExtras(lista) }}
+                </div>
+              </div>
+            </div>
+          
+            <!-- Sección derecha: Botones -->
+            <div class="acciones">   
+              <span class="icono me-2"
+              *ngIf="lista.propietario === propietario" 
+              (click)="generarEnlaceInvitacion(i)" style="cursor: pointer;" 
+              data-bs-toggle="tooltip" title="Generar enlace de invitación">
+                <i class="bi bi-share"></i>
+              </span>
+
+              <span class="icono me-2" (click)="abrirModalAgregarProducto(i)" style="cursor: pointer;"
+              data-bs-toggle="tooltip" title="Agregar producto">
+                <i class="bi bi-plus-circle"></i>
+              </span>
+          
+              <span class="icono me-2" 
+              (click)="editarModal(i)" style="cursor: pointer;"
+              data-bs-toggle="tooltip" title="Editar lista">
+                <i class="bi bi-pen"></i>
+              </span>
+          
+              <!-- Icono de eliminar -->
+              <span [ngClass]="{'me-2': lista.propietario === propietario}"  
+              *ngIf="lista.propietario === propietario"
+              (click)="eliminarLista(i)" style="cursor: pointer;"
+              data-bs-toggle="tooltip" title="Eliminar lista">
+                <i class="bi bi-trash"></i>
+              </span>
+
+              <!-- Icono de ver oir -->
+              <span class="icono" (click)="oirLista(i)" style="cursor: pointer;"
+              data-bs-toggle="tooltip" title="Escuchar lista">
+                <i class="bi bi-ear"></i>
+              </span>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+</section>
 
-<!-- Modal -->
+<!-- Modal para agregar productos -->
 <div class="modal fade" id="productoModal" tabindex="-1" aria-labelledby="productoModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="productoModalLabel">Añadir producto a {{ listaSeleccionada?.nombre }}</h5>
@@ -70,18 +119,221 @@
       </div>
       <div class="modal-body">
         <div class="mb-3">
-          <label for="producto" class="form-label">Nombre del Producto</label>
-          <input type="text" class="form-control" id="producto" [(ngModel)]="nuevoProducto">
+          <div class="coolinput">
+            <label for="producto" class="text">Producto:</label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control input"
+                id="producto"
+                [(ngModel)]="nuevoProducto"
+                placeholder="Escribe el nombre..." />
+              <button
+                class="btn mic-btn"
+                type="button"
+                (click)="iniciarReconocimiento('nombre')"
+                data-bs-toggle="tooltip" 
+                title="Hablar">
+                <i class="bi bi-mic"></i>
+              </button>
+            </div>
+          </div>
         </div>
         <div class="mb-3">
-          <label for="unidadesPedidas">Cantidad:</label>
-          <input type="number" min="0" max="10" id="unidadesPedidas" [(ngModel)]="unidadesPedidas" />
+          <div class="coolinput">
+            <label for="producto" class="text">Cantidad:</label>
+            <div class="input-group">
+              <input
+                type="number"
+                min="0"
+                class="form-control input"
+                id="unidadesPedidas"
+                [(ngModel)]="unidadesPedidas"
+                placeholder="Di la cantidad" />
+              <button
+                class="btn mic-btn"
+                type="button"
+                (click)="iniciarReconocimiento('cantidad')"
+                data-bs-toggle="tooltip" title="Hablar">
+                <i class="bi bi-mic"></i>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        <button type="button" class="btn btn-primary" (click)="agregarProducto()">Guardar Producto</button>
+        <button type="button" class="btn btn-primary" (click)="agregarProducto()">Añadir Producto</button>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Modal para ver todos los productos -->
+<div class="modal fade" id="verMasModal" tabindex="-1" aria-labelledby="verMasModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="verMasModalLabel">Productos de {{ listaSeleccionada?.nombre }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <label class="toggleSwitch" for="checkboxInput" (click)="oirLista(indiceListaSeleccionada)"
+        data-bs-toggle="tooltip" title="Escuchar lista">
+          <i class="bi bi-ear"></i>
+        </label>
+
+        <table class="table table-sm">
+          <thead>
+            <tr class="text-center">
+              <th></th>
+              <th>Pedidas</th>
+              <th>Compradas</th>
+              <th>Pendientes</th>
+              <th>Comprar</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let producto of listaSeleccionada?.productos; let j = index">
+              <td>{{ producto.nombre }}</td>
+              <td class="text-center">{{ producto.udsPedidas }}</td>
+              <td class="text-center">{{ producto.udsCompradas }}</td>
+              <td class="text-center">{{ producto.udsPendientes }}</td>
+              <td class="text-center">
+                <input type="number" min="0" [max]="producto.udsPedidas"
+                  [(ngModel)]="producto.udsCompraTemporal" class="form-control form-control-sm"
+                  (change)="actualizarCantidadComprada(producto, indiceListaSeleccionada, j)" 
+                  placeholder="0"
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para editar productos y gestionar invitaciones -->
+<div class="modal fade" id="editarProductosModal" tabindex="-1" aria-labelledby="editarProductosModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editarProductosModalLabel">Gestionar {{ listaSeleccionada?.nombre }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Navegación de Tabs -->
+        <ul class="nav nav-tabs" id="gestorTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link active"
+              id="productos-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#productos"
+              type="button"
+              role="tab"
+              aria-controls="productos"
+              aria-selected="true">
+              Productos
+            </button>
+          </li>
+          <!-- Tab de Invitaciones: Visible solo para el propietario -->
+          <li class="nav-item" role="presentation" *ngIf="listaSeleccionada?.propietario === propietario">
+            <button
+              class="nav-link"
+              id="invitaciones-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#invitaciones"
+              type="button"
+              role="tab"
+              aria-controls="invitaciones"
+              aria-selected="false">
+              Invitaciones
+            </button>
+          </li>
+        </ul>
+
+        <!-- Contenido de los Tabs -->
+        <div class="tab-content" id="gestorTabsContent">
+          <!-- Tab de Productos -->
+          <div
+            class="tab-pane fade show active"
+            id="productos"
+            role="tabpanel"
+            aria-labelledby="productos-tab">
+            <table class="table table-sm mt-3">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Pedidas</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let producto of listaSeleccionada?.productos; let j = index">
+                  <td>
+                    <input
+                      type="text"
+                      [(ngModel)]="producto.nombre"
+                      (focus)="almacenarValoresOriginales(producto)"
+                      (change)="actualizarProducto(producto, indiceListaSeleccionada)"
+                      class="form-control form-control-sm" />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      [(ngModel)]="producto.udsPedidas"
+                      (focus)="almacenarValoresOriginales(producto)"
+                      (change)="actualizarProducto(producto, indiceListaSeleccionada)"
+                      min="0"
+                      class="form-control form-control-sm" />
+                  </td>
+                  <td class="text-center align-middle">
+                    <span
+                      class="icono"
+                      (click)="eliminarProducto(producto.id, indiceListaSeleccionada, j)"
+                      style="cursor: pointer;" data-bs-toggle="tooltip" title="Eliminar producto">
+                      <i class="bi bi-trash"></i>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Tab de Invitaciones -->
+          <div
+            class="tab-pane fade"
+            id="invitaciones"
+            role="tabpanel"
+            aria-labelledby="invitaciones-tab"
+            *ngIf="listaSeleccionada?.propietario === propietario">
+            <table class="table table-sm mt-3">
+              <thead>
+                <tr>
+                  <th>Correo</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let invitacion of listaSeleccionada?.invitaciones; let j = index">
+                  <td *ngIf="invitacion.usada">{{ invitacion.emailUsuario }}</td>
+                  <td *ngIf="invitacion.usada" class="text-center align-middle">
+                    <span
+                      class="icono"
+                      (click)="eliminarInvitacion(invitacion.id, indiceListaSeleccionada, j)"
+                      style="cursor: pointer;" data-bs-toggle="tooltip" title="Eliminar invitación">
+                      <i class="bi bi-trash"></i>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+

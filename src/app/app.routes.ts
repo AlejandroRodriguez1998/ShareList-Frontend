@@ -1,44 +1,66 @@
-// src/app/app.routes.ts
-import { Routes, CanActivateFn } from '@angular/router';
-import { inject } from '@angular/core';
-import { map } from 'rxjs/operators';
-import { UserService } from './user.service';
-import { Router, ActivatedRouteSnapshot } from '@angular/router';
-
-import { InicioComponent } from './inicio/inicio.component';
+import { Routes, CanActivateFn, Router, ActivatedRouteSnapshot } from '@angular/router';
 import { SobreNosotrosComponent } from './sobre-nosotros/sobre-nosotros.component';
-import { SuscripcionComponent } from './suscripcion/suscripcion.component';
-import { Login1Component } from './login1/login1.component';
-import { Registrar1Component } from './registrar1/registrar1.component';
 import { GestorListasComponent } from './gestor-listas/gestor-listas.component';
+import { SuscripcionComponent } from './suscripcion/suscripcion.component';
+import { InvitacionComponent } from './invitacion/invitacion.component';
+import { Registrar1Component } from './registrar1/registrar1.component';
+import { InicioComponent } from './inicio/inicio.component';
+import { Login1Component } from './login1/login1.component';
+import { map, switchMap, take } from 'rxjs/operators';
+import { UserService } from './user.service';
+import { inject } from '@angular/core';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
-// Guard único que controla el acceso en función de la autenticación y la ruta
-const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
+// AuthGuard que permite o deniega el acceso basado en el estado de autenticación y la ruta
+const authGuard: CanActivateFn = (route) => {
   const userService = inject(UserService);
   const router = inject(Router);
 
-  return userService.isLoggedIn$.pipe(
-    map(isLoggedIn => {
-      console.log('Ruta:', route.routeConfig?.path, 'Autenticado:', isLoggedIn);
-      const path = route.routeConfig?.path;
+  // Obtener la ruta actual
+  const currentRoute = route.routeConfig?.path || '';
 
-      // Rutas de acceso público solo para usuarios no autenticados
-      if (['IniciarSesion', 'Registrarse'].includes(path!) && isLoggedIn) {
-        router.navigate(['/GestionarListas']); // Redirige si ya está autenticado
-        return false;
-      }
+  // Esperar a que el estado de carga inicial termine
+  if (userService.isLoading) {
+    return userService.loadingCompleted$.pipe(
+      take(1),
+      switchMap(() => userService.validateToken()),
+      map((isAuthenticated) => {
+        return handleRouteAccess(currentRoute, isAuthenticated, router);
+      })
+    );
+  }
 
-      // Rutas protegidas que requieren autenticación
-      if (['GestionarListas'].includes(path!) && !isLoggedIn) {
-        router.navigate(['/IniciarSesion']); // Redirige si no está autenticado
-        return false;
-      }
-
-      // Permitir el acceso en todos los demás casos
-      return true;
+  // Validar el token para determinar el estado de autenticación
+  return userService.validateToken().pipe(
+    map((isAuthenticated) => {
+      return handleRouteAccess(currentRoute, isAuthenticated, router);
     })
   );
 };
+
+// Función que maneja el acceso según la ruta y el estado de autenticación
+function handleRouteAccess(route: string, isAuthenticated: boolean, router: Router) {
+  // Rutas restringidas para usuarios autenticados
+  const restrictedIfAuthenticated = ['IniciarSesion', 'Registrarse'];
+
+  // Rutas restringidas para usuarios no autenticados
+  const restrictedIfNotAuthenticated = ['GestionarListas', 'Invitacion'];
+
+  if (isAuthenticated && restrictedIfAuthenticated.includes(route)) {
+    console.log(`[AuthGuard] Usuario autenticado intentando acceder a ruta restringida: ${route}.`);
+    router.navigate(['/']); // Redirige al inicio si está autenticado
+    return false;
+  }
+
+  if (!isAuthenticated && restrictedIfNotAuthenticated.includes(route)) {
+    console.log(`[AuthGuard] Usuario no autenticado intentando acceder a ruta restringida: ${route}.`);
+    router.navigate(['/IniciarSesion']); // Redirige a iniciar sesión si no está autenticado
+    return false;
+  }
+
+  // Permitir acceso si no está restringido
+  return true;
+}
 
 export const routes: Routes = [
   { path: '', component: InicioComponent },
@@ -46,6 +68,9 @@ export const routes: Routes = [
   { path: 'Registrarse', component: Registrar1Component, canActivate: [authGuard] },
   { path: 'Suscripcion', component: SuscripcionComponent },
   { path: 'GestionarListas', component: GestorListasComponent, canActivate: [authGuard] },
+  { path: 'Invitacion', component: InvitacionComponent, canActivate: [authGuard] },
   { path: 'SobreNosotros', component: SobreNosotrosComponent },
-  { path: '**', redirectTo: '', pathMatch: 'full' }
+  { path: 'reset-password', component: ResetPasswordComponent },
+
+  { path: '**', redirectTo: '', pathMatch: 'full' },
 ];
