@@ -11,7 +11,7 @@
 
     <div class="row flex-wrap g-3 justify-content-center justify-content-md-start mt-1">
       <div class="col-auto mt-4" *ngFor="let lista of misListas; let i = index">
-        <div class="card h-100" style="min-width: 400px; max-width: 600px;">
+        <div class="card h-100" style="min-width: auto; max-width: 100%;">
           <div class="card-body">
             <h5 class="card-title text-center">{{ lista.nombre.charAt(0).toUpperCase() + lista.nombre.slice(1).toLowerCase() }}</h5>
             <!-- <p class="card-text">ID: {{ lista.id }}</p> -->
@@ -24,7 +24,7 @@
                   <th></th>
                   <th>Pedidas</th>
                   <th>Compradas</th>
-                  <th>Pendientes</th>
+                  <th class="d-none d-sm-table-cell">Pendientes</th>
                   <th>Comprar</th>
                 </tr>
               </thead>
@@ -33,7 +33,7 @@
                   <td>{{ producto.nombre }}</td>
                   <td class="text-center">{{ producto.udsPedidas }}</td>
                   <td class="text-center">{{ producto.udsCompradas }}</td>
-                  <td class="text-center">{{ producto.udsPendientes }}</td>
+                  <td class="text-center d-none d-sm-table-cell">{{ producto.udsPendientes }}</td>
                   <td class="text-center">
                     <input type="number" min="0" [max]="producto.udsPedidas"
                       [(ngModel)]="producto.udsCompraTemporal" class="form-control form-control-sm"
@@ -188,7 +188,7 @@
               <th></th>
               <th>Pedidas</th>
               <th>Compradas</th>
-              <th>Pendientes</th>
+              <th class="d-none d-sm-table-cell">Pendientes</th>
               <th>Comprar</th>
             </tr>
           </thead>
@@ -197,7 +197,7 @@
               <td>{{ producto.nombre }}</td>
               <td class="text-center">{{ producto.udsPedidas }}</td>
               <td class="text-center">{{ producto.udsCompradas }}</td>
-              <td class="text-center">{{ producto.udsPendientes }}</td>
+              <td class="text-center d-none d-sm-table-cell">{{ producto.udsPendientes }}</td>
               <td class="text-center">
                 <input type="number" min="0" [max]="producto.udsPedidas"
                   [(ngModel)]="producto.udsCompraTemporal" class="form-control form-control-sm"

@@ -4,7 +4,8 @@
 }
 
 :host-context(.app-loaded) .app-content {
-    display: block; /* Mostrar contenido cuando isLoading sea falso */
+    display: flex; /* Mostrar contenido cuando isLoading sea falso */
+    flex-direction: column;
 }
 
 nav {
@@ -38,6 +39,20 @@ nav {
 .nav-link:hover {
     background: #26415E;
     border-radius: 5px;
+}
+
+@media (max-width: 767.98px) {
+    .buttonIniciar {
+        width: 95px !important;
+        height: 25px !important;
+        font-size: 12px;
+    }
+
+    .Btn {
+        font-size: 12px;
+        width: 45px !important;
+        height: 30px !important;
+    }
 }
 
 .buttonIniciar {
