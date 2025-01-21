@@ -28,7 +28,7 @@ Esta aplicación es responsive en todos los dispositivos, con un diseño bonito 
 
 ## :video_camera: Video
 
-Aquí tienes un [video]() haciéndote un tour por la aplicación. (Se subirá pronto...)
+Aquí tienes un [video](https://youtu.be/TNTpTDJU-FM) haciéndote un tour por la aplicación. (Se subirá pronto...)
 
 ## ⚙️ Requisitos
 
